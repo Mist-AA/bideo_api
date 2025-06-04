@@ -21,6 +21,7 @@ public class FirebaseConfig {
             assert serviceAccount != null;
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setStorageBucket("project-video-70341.firebasestorage.app")
                     .build();
 
             // Initialize the Firebase App with credentials
