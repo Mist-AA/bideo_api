@@ -3,30 +3,36 @@ package com.video_streaming.project_video.Firebase;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.auth.FirebaseAuth;
+
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 
 @Configuration
 public class FirebaseConfig {
 
-    @PostConstruct
-    public void initialize() {
-        try {
-            // Load the service account key JSON file from resources
-            InputStream serviceAccount = getClass().getResourceAsStream("/service-account.json");
+    public static Object firebaseAuth;
+    private InputStream serviceAccount = getClass().getResourceAsStream("/service-account.json");
 
+    @Bean
+    public FirebaseApp firebaseApp() {
+        try {
             assert serviceAccount != null;
-            FirebaseOptions options = FirebaseOptions.builder()
+            FirebaseOptions firebaseOptions = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
-
-            // Initialize the Firebase App with credentials
-            FirebaseApp.initializeApp(options);
-        } catch (IOException e) {
+            return FirebaseApp.initializeApp(firebaseOptions);
+        }
+        catch (IOException e) {
             throw new RuntimeException("Failed to initialize Firebase", e);
         }
+}
+
+    @Bean
+    public FirebaseAuth firebaseAuth(FirebaseApp firebaseApp) {
+        return FirebaseAuth.getInstance(firebaseApp);
     }
 }
