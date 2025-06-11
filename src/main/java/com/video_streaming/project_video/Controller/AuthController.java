@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.video_streaming.project_video.Firebase.FirebaseAuthService;
+import com.video_streaming.project_video.CloudResConfig.FirebaseAuthService;
 import com.video_streaming.project_video.Service.UserService;
 
 @RestController

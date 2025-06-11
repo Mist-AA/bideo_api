@@ -1,4 +1,4 @@
-package com.video_streaming.project_video.Firebase;
+package com.video_streaming.project_video.CloudResConfig;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
