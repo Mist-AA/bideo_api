@@ -32,7 +32,7 @@ public class S3ServiceImpl implements S3Service {
         try {
             PutObjectRequest request = new PutObjectRequest(bucketName, file.getName(), file);
             amazonS3.putObject(request);
-            return "File uploaded successfully: " + file.getName();
+            return "File uploaded successfully: " + file.getName() + "URL: " + amazonS3.getUrl(bucketName, file.getName());
         } catch (AmazonServiceException ase) {
             // AWS service error (e.g., permission issues, bucket not found)
             ase.printStackTrace();
