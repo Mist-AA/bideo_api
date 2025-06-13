@@ -1,12 +1,7 @@
 package com.video_streaming.project_video.Controller;
 
-import com.video_streaming.project_video.DTOMapper.VideoDTOMapper;
-import com.video_streaming.project_video.DTOs.VideoDTO;
-import com.video_streaming.project_video.Entity.Video;
-import com.video_streaming.project_video.Repository.VideoRepository;
 import com.video_streaming.project_video.Service.S3Service;
-
-import jakarta.validation.Valid;
+import com.video_streaming.project_video.Service.SenderProcessService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,29 +21,37 @@ public class VideoController {
     private S3Service s3Service;
 
     @Autowired
-    private VideoRepository videoRepository;
+    private SenderProcessService messageSender;
 
-    // Upload a file to S3
+    /**
+     * Endpoint to upload a video file.
+     * Validates the file type and uploads it to S3.
+     * @param multipartFile The video file to upload
+     * @return ResponseEntity with the result of the upload
+     */
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile multipartFile) {
-        if (multipartFile.isEmpty()) {
+    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile videoFile) {
+        if (videoFile.isEmpty()) {
             return ResponseEntity.badRequest().body("File is empty");
         }
 
         File tempFile = null;
         try {
             Tika tika = new Tika();
-            String detectedType = tika.detect(multipartFile.getBytes());
+            String detectedType = tika.detect(videoFile.getBytes());
             if (!detectedType.startsWith("video/")) {
                 return ResponseEntity.badRequest().body("File is not a valid video type");
             }
             
             // Create a temp file in the system's temp directory
-            tempFile = File.createTempFile("upload-", "-" + multipartFile.getOriginalFilename());
-            multipartFile.transferTo(tempFile);
+            tempFile = File.createTempFile("upload-", "-" + videoFile.getOriginalFilename());
+            videoFile.transferTo(tempFile);
 
             // Upload to S3
             String result = s3Service.uploadFile(tempFile);
+            
+            // Send video to RabbitMQ
+            messageSender.sendVideoPath(result);
             return ResponseEntity.ok(result);
 
         } catch (IOException e) {
@@ -63,19 +66,14 @@ public class VideoController {
         }
     }
 
-
-    // Download a file from S3
+    /**
+     * Endpoint to download a file from S3.
+     * @param fileName The name of the file to download
+     * @return The key of the downloaded file
+     */
     @GetMapping("/download/{fileName}")
     public String downloadFile(@PathVariable String fileName) {
         return s3Service.downloadFile(fileName).getKey();
     }
 
-    public String uploadVideoData(@RequestBody @Valid VideoDTO videoDTO) throws Exception {
-
-        VideoDTOMapper videoDTOMapper = new VideoDTOMapper();
-        Video video = videoDTOMapper.convertDTOToEntity(videoDTO);
-        videoRepository.save(video);
-
-        return "Video uploaded";
-    }
 }

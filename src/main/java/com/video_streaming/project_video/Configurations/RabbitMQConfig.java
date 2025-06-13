@@ -1,4 +1,4 @@
-package com.video_streaming.project_video.CloudResConfig;
+package com.video_streaming.project_video.Configurations;
 
 import org.springframework.amqp.core.*;
 import org.springframework.context.annotation.Bean;
@@ -7,12 +7,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    public static final String QUEUE = "testQueue";
-    public static final String EXCHANGE = "testExchange";
-    public static final String ROUTING_KEY = "test.key";
+    public static final String QUEUE = "videoQueue";
+    public static final String EXCHANGE = "videoExchange";
+    public static final String ROUTING_KEY = "video.key";
 
     @Bean
-    public Queue queue() {
+    public Queue videoEncoderQueue() {
         return new Queue(QUEUE, false);
     }
 
