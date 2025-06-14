@@ -1,4 +1,4 @@
-package com.video_streaming.project_video.CloudResConfig;
+package com.video_streaming.project_video.Configurations;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;

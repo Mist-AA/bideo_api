@@ -7,16 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.video_streaming.project_video.CloudResConfig.FirebaseAuthService;
+import com.video_streaming.project_video.Service.FirebaseAuthService;
 import com.video_streaming.project_video.Service.UserService;
 
 @RestController
-@RequestMapping("")
+@RequestMapping("/app")
 public class AuthController {
 
     @Autowired
     private FirebaseAuthService firebaseAuthService;
-
     @Autowired
     private UserService userService;
 
@@ -25,7 +24,14 @@ public class AuthController {
         return ResponseEntity.ok("Service is running!");
     }
 
-    @PostMapping("/create")
+    /**
+     * Endpoint to create a new user.
+     * @param email User's email
+     * @param password User's password
+     * @param user_name User's name
+     * @return ResponseEntity with creation result
+     */
+    @PostMapping("/createUser")
     public ResponseEntity<String> createUser(@RequestParam String email, @RequestParam String password, @RequestParam String user_name) {
         try {
             userService.create(email, password, user_name);
@@ -35,7 +41,12 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/verify")
+    /**
+     * Endpoint to verify Firebase ID token.
+     * @param idToken Firebase ID token
+     * @return ResponseEntity with verification result
+     */
+    @PostMapping("/verifyToken")
     public ResponseEntity<String> verifyToken(@RequestBody String idToken) {
         try {
             FirebaseToken decodedToken = firebaseAuthService.verifyToken(idToken);
