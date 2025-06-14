@@ -25,39 +25,30 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
          try {
             System.out.println("Received video for processing: " + inputPath);
 
-            // String outputPath = inputPath.replace(".mp4", "_720p.mp4");
-
-            String outputPath = "D:\\1mb_720p.mp4";
+            String outputPath = inputPath.replace(".mp4", "_720p.mp4");
 
             ProcessBuilder builder = new ProcessBuilder(
                     "ffmpeg", "-i", inputPath,
-                    "-vf", "scale=1280:720",
+                    "-vf", "scale=720:480",
                     outputPath
             );
             builder.redirectErrorStream(true);
             Process process = builder.start();
-            // int exitCode = process.waitFor();
 
             // Code for debugging ffmpeg output
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null) {
-                System.out.println("[ffmpeg] " + line);
+                // do nothing
             }
-
-            boolean finished = process.waitFor(20, TimeUnit.SECONDS);
+            
+            boolean finished = process.waitFor(10, TimeUnit.SECONDS);
             if (!finished) {
                 process.destroyForcibly();
                 throw new RuntimeException("FFmpeg timeout");
+            } else {
+                System.out.println("FFmpeg process completed successfully.");
             }
-
-
-            // if (exitCode == 0) {
-            //     System.out.println("Encoding complete: " + outputPath);
-
-            // } else {
-            //     System.err.println("FFmpeg failed with exit code: " + exitCode);
-            // }
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
