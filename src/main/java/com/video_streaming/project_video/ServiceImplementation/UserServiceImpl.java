@@ -19,6 +19,8 @@ import com.google.firebase.auth.UserRecord.CreateRequest;
 @Service
 public class UserServiceImpl implements UserService {
     private static final String DUPLICATE_ACCOUNT_ERROR = "EMAIL_EXISTS";
+    private static final String USER_ROLE_USER = "USER";
+
 
     private final FirebaseAuth firebaseAuth;
 
@@ -56,7 +58,7 @@ public class UserServiceImpl implements UserService {
     public void updateUser(UserDTO userDTO){
         UserDTOMapper userDTOMapper = new UserDTOMapper();
         User user = userDTOMapper.convertDTOToEntity(userDTO);
-        user.setUser_role("USER");
+        user.setUser_role(USER_ROLE_USER);
         
         userRepository.save(user);
     }

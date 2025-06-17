@@ -1,5 +1,6 @@
 package com.video_streaming.project_video.Entity;
 
+import java.util.Date;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,12 +12,11 @@ import lombok.*;
 @Table(name = "vid_metadata")
 public class Video {
     @Id
-    private Long video_id;
-    private String video_title;
+    private String originalVideoPath;
     private String video_url;
-    private String video_uploadDate;
-    private String video_originalVideoPath;
-    private String video_encoded720pPath;
+    private String video_title;
+    private Date video_uploadDate;
+    private String encoded720pPath;
     private Long video_views;
 
     @ManyToOne

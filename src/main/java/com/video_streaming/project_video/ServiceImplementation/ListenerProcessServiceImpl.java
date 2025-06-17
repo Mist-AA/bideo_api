@@ -3,6 +3,7 @@ package com.video_streaming.project_video.ServiceImplementation;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
@@ -13,21 +14,22 @@ import org.springframework.stereotype.Service;
 
 import com.video_streaming.project_video.Configurations.RabbitMQConfig;
 import com.video_streaming.project_video.Service.ListenerProcessService;
-import com.video_streaming.project_video.Service.S3Service;
+import com.video_streaming.project_video.Service.VideoService;
 
 @Service
 public class ListenerProcessServiceImpl implements ListenerProcessService {
 
     @Autowired
-    private S3Service s3Service;
+    private VideoService videoService;
 
     @RabbitListener(queues = RabbitMQConfig.QUEUE)
     public void receiveVideo(String inputPath) {
         System.out.println("🎥 Received video for processing: " + inputPath);
 
         try {
-            String originalFileName = Paths.get(inputPath).getFileName().toString();
-            String baseName = originalFileName.replaceAll("\\.\\w+$", "");
+            URI uri = new URI(inputPath);
+            String fileName = Paths.get(uri.getPath()).getFileName().toString();
+            String baseName = fileName.replaceAll("\\.\\w+$", "");
             File outputDir = new File("processed_videos");
             if (!outputDir.exists()) {
                 outputDir.mkdirs();
@@ -57,9 +59,10 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
                 System.out.println("FFmpeg process completed successfully.");
             }
 
-            String s3Url = s3Service.uploadFile(tempFile);
+            String s3Url = videoService.uploadFile(tempFile);
             System.out.println("Video uploaded to S3 at: " + s3Url);
 
+            videoService.updateVideoEncodedPath(inputPath, s3Url);
             Files.deleteIfExists(tempFile.toPath());
 
         } catch (Exception e) {

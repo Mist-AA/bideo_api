@@ -1,11 +1,13 @@
 package com.video_streaming.project_video.Service;
 
-import org.springframework.web.bind.annotation.RequestBody;
+import com.amazonaws.services.s3.model.S3Object;
+import com.video_streaming.project_video.DTOs.UserDTO;
 
-import com.video_streaming.project_video.DTOs.VideoDTO;
-
-import jakarta.validation.Valid;
+import java.io.File;
 
 public interface VideoService {
-    public String uploadVideoData(@RequestBody @Valid VideoDTO videoDTO) throws Exception;
+    String uploadFile(File file);
+    S3Object downloadFile(String fileName);
+    void uploadVideoMetadata(String result, String videoTitle, UserDTO userDTO);
+    void updateVideoEncodedPath(String originalFilePath, String encodedVideoPath);
 }

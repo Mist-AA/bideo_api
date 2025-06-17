@@ -1,6 +1,7 @@
 package com.video_streaming.project_video.Controller;
 
-import com.video_streaming.project_video.Service.S3Service;
+import com.video_streaming.project_video.DTOs.UserDTO;
+import com.video_streaming.project_video.Service.VideoService;
 import com.video_streaming.project_video.Service.SenderProcessService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import java.io.IOException;
 public class VideoController {
 
     @Autowired
-    private S3Service s3Service;
+    private VideoService videoService;
 
     @Autowired
     private SenderProcessService messageSender;
@@ -30,7 +31,8 @@ public class VideoController {
      * @return ResponseEntity with the result of the upload
      */
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile videoFile) {
+    public ResponseEntity<String> uploadVidResponseEntity(@RequestParam("file") MultipartFile videoFile, 
+                                                                                @RequestParam String videoTitle, @RequestParam(required = false) UserDTO userDTO) {
         if (videoFile.isEmpty()) {
             return ResponseEntity.badRequest().body("File is empty");
         }
@@ -47,8 +49,9 @@ public class VideoController {
             tempFile = File.createTempFile("upload-", "-" + videoFile.getOriginalFilename());
             videoFile.transferTo(tempFile);
 
-            String result = s3Service.uploadFile(tempFile);
-            
+            String result = videoService.uploadFile(tempFile);
+            videoService.uploadVideoMetadata(result, videoTitle, userDTO);
+
             messageSender.sendVideoPath(result);
             return ResponseEntity.ok(result);
 
@@ -70,7 +73,7 @@ public class VideoController {
      */
     @GetMapping("/download/{fileName}")
     public String downloadFile(@PathVariable String fileName) {
-        return s3Service.downloadFile(fileName).getKey();
+        return videoService.downloadFile(fileName).getKey();
     }
 
 }
