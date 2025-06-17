@@ -1,8 +1,8 @@
 # Start with a base image containing Java runtime
-FROM openjdk:8-jdk-alpine
+FROM eclipse-temurin:21-jdk-alpine
 
-# Add Maintainer Info
-LABEL maintainer="your.email@example.com"
+# Set the working directory
+WORKDIR /app
 
 # Add a volume pointing to /tmp
 VOLUME /tmp
@@ -17,4 +17,4 @@ ARG JAR_FILE=target/project_video-0.0.1-SNAPSHOT.jar
 ADD ${JAR_FILE} app.jar
 
 # Run the jar file
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","app.jar"]

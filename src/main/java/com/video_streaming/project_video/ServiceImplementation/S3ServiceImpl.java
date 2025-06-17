@@ -34,15 +34,16 @@ public class S3ServiceImpl implements S3Service {
             amazonS3.putObject(request);
             return amazonS3.getUrl(bucketName, file.getName()).toString();
         } catch (AmazonServiceException ase) {
-            // AWS service error (e.g., permission issues, bucket not found)
+            // To do: Add logging here
+            // Fix global exception handling
             ase.printStackTrace();
             return "Service error uploading file: " + ase.getMessage();
         } catch (SdkClientException sce) {
-            // SDK/client-side issue (e.g., file not found, network error)
+            // To do: Add logging here
             sce.printStackTrace();
             return "Client error uploading file: " + sce.getMessage();
         } catch (Exception e) {
-            // Any other unexpected error
+            // To do: Add logging here
             e.printStackTrace();
             return "Unexpected error uploading file: " + e.getMessage();
         }

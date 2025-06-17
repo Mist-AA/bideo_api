@@ -47,10 +47,8 @@ public class VideoController {
             tempFile = File.createTempFile("upload-", "-" + videoFile.getOriginalFilename());
             videoFile.transferTo(tempFile);
 
-            // Upload to S3
             String result = s3Service.uploadFile(tempFile);
             
-            // Send video to RabbitMQ
             messageSender.sendVideoPath(result);
             return ResponseEntity.ok(result);
 
@@ -59,7 +57,6 @@ public class VideoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to process file: " + e.getMessage());
             
         } finally {
-            // Clean up the temporary file
             if (tempFile != null && tempFile.exists()) {
                 tempFile.delete();
             }
