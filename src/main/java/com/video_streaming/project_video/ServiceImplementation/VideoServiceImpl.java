@@ -4,7 +4,6 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
 import com.video_streaming.project_video.DTOMapper.VideoDTOMapper;
 import com.video_streaming.project_video.DTOs.UserDTO;
 import com.video_streaming.project_video.DTOs.VideoDTO;
@@ -61,10 +60,33 @@ public class VideoServiceImpl implements VideoService {
         }
     }
 
+    public String uploadDirectory(File directory, String fileNamePrefix) {
+        if (directory == null || !directory.exists() || !directory.isDirectory()) {
+            return "Error: File is not a directory - " + (directory != null ? directory.getAbsolutePath() : "null");
+        }
+        File[] files = directory.listFiles();
+        if (files == null || files.length == 0) {
+            throw new RuntimeException("Directory is empty: " + directory.getAbsolutePath());
+        }
 
-    @Override
-    public S3Object downloadFile(String fileName) {
-        return amazonS3.getObject(bucketName, fileName);
+        String s3FileURL = null;
+
+        for (File file : files) {
+            String filenameString = fileNamePrefix + "/" + file.getName();
+
+            PutObjectRequest request = new PutObjectRequest(bucketName, filenameString, file);
+            amazonS3.putObject(request);
+
+            if (file.getName().endsWith(".m3u8")) {
+                s3FileURL = amazonS3.getUrl(bucketName, filenameString).toString();
+            }
+        }
+
+        if (s3FileURL == null) {
+            throw new RuntimeException(".m3u8 file not found in directory: " + directory.getAbsolutePath());
+        }
+
+        return s3FileURL;
     }
 
     @Transactional
@@ -97,5 +119,13 @@ public class VideoServiceImpl implements VideoService {
             video.setEncoded720pPath(encodedVideoPath);
             videoRepository.save(video);
         }
+    }
+
+    public String viewVideo(String videoKeySuffix) {
+        String videoURL = videoRepository.findEncoded720PathByOriginalVideoPath(videoKeySuffix);
+        if (videoURL == null) {
+            throw new RuntimeException("Video not found");
+        }
+        return videoURL;
     }
 }

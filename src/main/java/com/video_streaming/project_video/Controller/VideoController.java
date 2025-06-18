@@ -66,14 +66,10 @@ public class VideoController {
         }
     }
 
-    /**
-     * Endpoint to download a file from S3.
-     * @param fileName The name of the file to download
-     * @return The key of the downloaded file
-     */
-    @GetMapping("/download/{fileName}")
-    public String downloadFile(@PathVariable String fileName) {
-        return videoService.downloadFile(fileName).getKey();
+    @GetMapping("/view/{videoKeySuffix}")
+    public ResponseEntity<String> getVidResponseEntity(@PathVariable String videoKeySuffix) {
+        String videoURL = videoService.viewVideo(videoKeySuffix);
+        return ResponseEntity.ok("Video fetched successfully: " + videoURL);
     }
 
 }

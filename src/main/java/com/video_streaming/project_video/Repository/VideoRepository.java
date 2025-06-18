@@ -5,4 +5,5 @@ import com.video_streaming.project_video.Entity.Video;
 
 public interface VideoRepository extends JpaRepository<Video, Long> {
     Video findByOriginalVideoPath(String videoPath);
+    String findEncoded720PathByOriginalVideoPath(String videoPath);
 }
