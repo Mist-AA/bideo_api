@@ -3,12 +3,16 @@ package com.video_streaming.project_video.Controller;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 
+import com.video_streaming.project_video.Entity.FirebaseRefreshTokenResponse;
+import com.video_streaming.project_video.Entity.FirebaseSignInResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.video_streaming.project_video.Service.FirebaseAuthService;
 import com.video_streaming.project_video.Service.UserService;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/app")
@@ -24,13 +28,6 @@ public class AuthController {
         return ResponseEntity.ok("Service is running!");
     }
 
-    /**
-     * Endpoint to create a new user.
-     * @param email User's email
-     * @param password User's password
-     * @param user_name User's name
-     * @return ResponseEntity with creation result
-     */
     @PostMapping("/createUser")
     public ResponseEntity<String> createUser(@RequestParam String email, @RequestParam String password, @RequestParam String user_name) {
         try {
@@ -41,11 +38,6 @@ public class AuthController {
         }
     }
 
-    /**
-     * Endpoint to verify Firebase ID token.
-     * @param idToken Firebase ID token
-     * @return ResponseEntity with verification result
-     */
     @PostMapping("/verifyToken")
     public ResponseEntity<String> verifyToken(@RequestBody String idToken) {
         try {
@@ -55,5 +47,17 @@ public class AuthController {
         } catch (FirebaseAuthException e) {
             return ResponseEntity.status(401).body("Invalid token: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<FirebaseSignInResponse> login(@RequestParam String email,@RequestParam String password) {
+        FirebaseSignInResponse response = firebaseAuthService.signInWithEmailAndPassword(email, password);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<FirebaseRefreshTokenResponse> refreshToken(@RequestParam String refreshToken) {
+        FirebaseRefreshTokenResponse response = firebaseAuthService.refreshIdToken(refreshToken);
+        return ResponseEntity.ok(response);
     }
 }

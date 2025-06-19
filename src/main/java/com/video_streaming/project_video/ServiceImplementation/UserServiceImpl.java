@@ -55,11 +55,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public void updateUser(UserDTO userDTO){
+    private void updateUser(UserDTO userDTO){
         UserDTOMapper userDTOMapper = new UserDTOMapper();
         User user = userDTOMapper.convertDTOToEntity(userDTO);
         user.setUser_role(USER_ROLE_USER);
-        
         userRepository.save(user);
     }
 

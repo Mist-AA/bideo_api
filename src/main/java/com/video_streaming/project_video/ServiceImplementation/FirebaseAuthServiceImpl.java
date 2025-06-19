@@ -1,17 +1,85 @@
 package com.video_streaming.project_video.ServiceImplementation;
 
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
+import com.video_streaming.project_video.Entity.FirebaseRefreshTokenRequest;
+import com.video_streaming.project_video.Entity.FirebaseRefreshTokenResponse;
+import com.video_streaming.project_video.Entity.FirebaseSignInRequest;
+import com.video_streaming.project_video.Entity.FirebaseSignInResponse;
 import com.video_streaming.project_video.Service.FirebaseAuthService;
-
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Service;
+
+
+import org.springframework.web.client.HttpClientErrorException;
+
+import javax.swing.plaf.synth.SynthTextAreaUI;
 
 @Service
 public class FirebaseAuthServiceImpl implements FirebaseAuthService {
+
+    @Value("${firebase.api.key}")
+    private String FIREBASE_API_KEY;
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    private String getSignInUrl() {
+        return STR."https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=\{FIREBASE_API_KEY}";
+    }
+
+    private String getRefreshTokenURL(){
+        return "https://securetoken.googleapis.com/v1/token?key=" + FIREBASE_API_KEY;
+    }
+
 
     public FirebaseToken verifyToken(String idToken) throws FirebaseAuthException {
         // Verify the Firebase ID Token received from the client-side
         return FirebaseAuth.getInstance().verifyIdToken(idToken);
     }
+
+    public FirebaseSignInResponse signInWithEmailAndPassword(String email, String password) {
+        FirebaseSignInRequest request = new FirebaseSignInRequest(email, password, true);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<FirebaseSignInRequest> entity = new HttpEntity<>(request, headers);
+
+        try {
+            System.out.println("RESPONSE");
+
+            ResponseEntity<FirebaseSignInResponse> response = restTemplate
+                    .postForEntity(getSignInUrl(), entity, FirebaseSignInResponse.class);
+
+            return response.getBody();
+
+        } catch (HttpClientErrorException e) {
+            throw new RuntimeException(STR."Firebase sign-in failed: \{e.getResponseBodyAsString()}");
+        }
+    }
+
+    public FirebaseRefreshTokenResponse refreshIdToken(String refreshToken) {
+        String refreshUrl = getRefreshTokenURL();
+
+        FirebaseRefreshTokenRequest request = new FirebaseRefreshTokenRequest(refreshToken);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<FirebaseRefreshTokenRequest> entity = new HttpEntity<>(request, headers);
+
+        try {
+            ResponseEntity<FirebaseRefreshTokenResponse> response = restTemplate
+                    .postForEntity(refreshUrl, entity, FirebaseRefreshTokenResponse.class);
+
+            return response.getBody();
+        } catch (HttpClientErrorException e) {
+            throw new RuntimeException("Token refresh failed: " + e.getResponseBodyAsString());
+        }
+    }
+
 }
