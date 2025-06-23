@@ -1,6 +1,7 @@
 package com.video_streaming.project_video.Controller;
 
 import com.video_streaming.project_video.DTOs.UserDTO;
+import com.video_streaming.project_video.DTOs.VideoDTO;
 import com.video_streaming.project_video.Service.VideoService;
 import com.video_streaming.project_video.Service.SenderProcessService;
 
@@ -13,6 +14,7 @@ import org.apache.tika.Tika;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/video")
@@ -70,6 +72,12 @@ public class VideoController {
     public ResponseEntity<String> getVidResponseEntity(@PathVariable String videoKeySuffix) {
         String videoURL = videoService.viewVideo(videoKeySuffix);
         return ResponseEntity.ok("Video fetched successfully: " + videoURL);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<VideoDTO>> getAllVideosList() {
+        List<VideoDTO> videoList = videoService.getAllVideos();
+        return ResponseEntity.ok(videoList);
     }
 
 }

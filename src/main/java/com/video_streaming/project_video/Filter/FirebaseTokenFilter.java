@@ -3,6 +3,8 @@ package com.video_streaming.project_video.Filter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
+import com.video_streaming.project_video.Configurations.SupportVariablesConfig;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,22 +16,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
 
 @Component
 public class FirebaseTokenFilter extends OncePerRequestFilter {
 
-    private static final List<String> WHITELISTED_PATHS = List.of(
-            "/user/login",
-            "/user",
-            "/app/refresh-token",
-            "/app/test"
-    );
-
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getServletPath();
-        return WHITELISTED_PATHS.contains(path);
+        return SupportVariablesConfig.WHITELISTED_PATHS.contains(path);
     }
 
     @Override

@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class VideoServiceImpl implements VideoService {
@@ -87,6 +89,14 @@ public class VideoServiceImpl implements VideoService {
         }
 
         return s3FileURL;
+    }
+
+    public List<VideoDTO> getAllVideos() {
+        List<Video> videos = videoRepository.findAll();
+        VideoDTOMapper videoDTOMapper = new VideoDTOMapper();
+        return videos.stream()
+                .map(videoDTOMapper::convertEntityToDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional

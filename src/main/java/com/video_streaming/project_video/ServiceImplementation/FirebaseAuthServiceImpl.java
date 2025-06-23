@@ -4,6 +4,7 @@ package com.video_streaming.project_video.ServiceImplementation;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
+import com.video_streaming.project_video.Configurations.SupportVariablesConfig;
 import com.video_streaming.project_video.Entity.FirebaseRefreshTokenRequest;
 import com.video_streaming.project_video.Entity.FirebaseRefreshTokenResponse;
 import com.video_streaming.project_video.Entity.FirebaseSignInRequest;
@@ -20,8 +21,6 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.web.client.HttpClientErrorException;
 
-import javax.swing.plaf.synth.SynthTextAreaUI;
-
 @Service
 public class FirebaseAuthServiceImpl implements FirebaseAuthService {
 
@@ -30,11 +29,11 @@ public class FirebaseAuthServiceImpl implements FirebaseAuthService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     private String getSignInUrl() {
-        return STR."https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=\{FIREBASE_API_KEY}";
+        return SupportVariablesConfig.signInTokenURLSuffix + FIREBASE_API_KEY;
     }
 
     private String getRefreshTokenURL(){
-        return "https://securetoken.googleapis.com/v1/token?key=" + FIREBASE_API_KEY;
+        return SupportVariablesConfig.refreshTokenURLSuffix + FIREBASE_API_KEY;
     }
 
 
@@ -58,7 +57,7 @@ public class FirebaseAuthServiceImpl implements FirebaseAuthService {
             return response.getBody();
 
         } catch (HttpClientErrorException e) {
-            throw new RuntimeException(STR."Firebase sign-in failed: \{e.getResponseBodyAsString()}");
+            throw new RuntimeException("Firebase sign-in failed" + e.getResponseBodyAsString());
         }
     }
 

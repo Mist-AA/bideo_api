@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import com.video_streaming.project_video.Service.FirebaseAuthService;
 import com.video_streaming.project_video.Service.UserService;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/app")
 public class AuthController {
@@ -42,7 +40,7 @@ public class AuthController {
     public ResponseEntity<String> verifyToken(@RequestBody String idToken) {
         try {
             FirebaseToken decodedToken = firebaseAuthService.verifyToken(idToken);
-            String uid = decodedToken.getUid();  // Firebase User ID
+            String uid = decodedToken.getUid();
             return ResponseEntity.ok("Token verified successfully! UID: " + uid);
         } catch (FirebaseAuthException e) {
             return ResponseEntity.status(401).body("Invalid token: " + e.getMessage());
