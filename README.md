@@ -1,4 +1,4 @@
-Video Streaming Platform project - Name Undecided
+Video Streaming Platform project - Bideo
 
 Authors - 
 @Mist-AA
