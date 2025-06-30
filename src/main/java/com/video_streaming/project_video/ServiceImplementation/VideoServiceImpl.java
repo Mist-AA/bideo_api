@@ -100,12 +100,13 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Transactional
-    public void uploadVideoMetadata(String result, String videoTitle, UserDTO userDTO) {
+    public Long uploadVideoMetadata(String result, String videoTitle, UserDTO userDTO) {
         VideoDTO videoDTO = new VideoDTO();
         VideoDTOMapper videoDTOMapper = new VideoDTOMapper();
         videoDTO.setVideo_url(null);
         videoDTO.setVideo_title(videoTitle);
         videoDTO.setVideo_uploadDate(new Date(System.currentTimeMillis()));
+        videoDTO.setM3u8Url(null);
         videoDTO.setVideo_views(0L);
         
         // Testing code
@@ -118,21 +119,22 @@ public class VideoServiceImpl implements VideoService {
         
         Video video = videoDTOMapper.convertDTOToEntity(videoDTO);
         video.setOriginalVideoPath(result);
-        video.setEncoded720pPath(null);
-        videoRepository.save(video);
+        Video savedVideo = videoRepository.save(video);
+
+        return savedVideo.getVideoId();
     }
 
     @Transactional
-    public void updateVideoEncodedPath(String originalFilePath, String encodedVideoPath) {
-        Video video = videoRepository.findByOriginalVideoPath(originalFilePath);
+    public void updateVideoEncodedPath(Long videoID, String encodedVideoPath) {
+        Video video = videoRepository.getReferenceById(videoID);
         if (video != null) {
-            video.setEncoded720pPath(encodedVideoPath);
+            video.setM3u8Url(encodedVideoPath);
             videoRepository.save(video);
         }
     }
 
-    public String viewVideo(String videoKeySuffix) {
-        String videoURL = videoRepository.findEncoded720PathByOriginalVideoPath(videoKeySuffix);
+    public String viewVideo(Long videoID) {
+        String videoURL = videoRepository.findM3u8UrlByVideoId(videoID);
         if (videoURL == null) {
             throw new RuntimeException("Video not found");
         }

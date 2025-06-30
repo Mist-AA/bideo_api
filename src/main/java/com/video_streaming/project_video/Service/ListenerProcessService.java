@@ -1,11 +1,13 @@
 package com.video_streaming.project_video.Service;
 
+import com.video_streaming.project_video.DTOs.MessageDTO;
+
 public interface ListenerProcessService {
     
     /**
      * This method is used to receive a video file from the listener.
      * 
-     * @param videoFile The path to the video file that needs to be processed.
+     * @param message video file object containing video file path and video ID.
      */
-    public void receiveVideo(String videoFile);
+    public void receiveVideo(MessageDTO message);
 }

@@ -14,7 +14,7 @@ public interface VideoService {
      * @param file The video file to be uploaded.
      * @return A string indicating the result of the upload operation.
      */
-    String uploadFile(File file);
+    public String uploadFile(File file);
 
 
     /**
@@ -24,7 +24,7 @@ public interface VideoService {
      * @param fileNamePrefix A prefix for the file names.
      * @return A string indicating the result of the upload operation.
      */
-    String uploadDirectory(File directory, String fileNamePrefix);
+    public String uploadDirectory(File directory, String fileNamePrefix);
 
 
     /**
@@ -39,9 +39,9 @@ public interface VideoService {
      * Uploads metadata for a video, including the result of the upload.
      *
      * @param userId The ID of the uploader.
-     * @return A list of VideoDTO objects representing the user's videos.
+     * @return Video id of the uploaded video.
      */
-    void uploadVideoMetadata(String result, String videoTitle, UserDTO userDTO);
+    public Long uploadVideoMetadata(String result, String videoTitle, UserDTO userDTO);
 
 
     /**
@@ -50,14 +50,14 @@ public interface VideoService {
      * @param originalFilePath The original file path of the video.
      * @param encodedVideoPath The new encoded video path to be set.
      */
-    void updateVideoEncodedPath(String originalFilePath, String encodedVideoPath);
+    public void updateVideoEncodedPath(Long videoID, String encodedVideoPath);
 
 
     /**
      * Retrieves the URL of a video based on its key suffix.
      *
-     * @param videoKeySuffix The suffix of the video key.
+     * @param videoID The video ID.
      * @return A string representing the URL of the video.
      */
-    String viewVideo(String videoKeySuffix);
+    public String viewVideo(Long videoID);
 }

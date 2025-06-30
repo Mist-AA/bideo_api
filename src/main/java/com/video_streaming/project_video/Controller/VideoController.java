@@ -14,7 +14,9 @@ import org.apache.tika.Tika;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/video")
@@ -52,9 +54,9 @@ public class VideoController {
             videoFile.transferTo(tempFile);
 
             String result = videoService.uploadFile(tempFile);
-            videoService.uploadVideoMetadata(result, videoTitle, userDTO);
+            Long videoID = videoService.uploadVideoMetadata(result, videoTitle, userDTO);
 
-            messageSender.sendVideoPath(result);
+            messageSender.sendVideoPath(result, videoID);
             return ResponseEntity.ok(result);
 
         } catch (IOException e) {
@@ -68,10 +70,13 @@ public class VideoController {
         }
     }
 
-    @GetMapping("/view/{videoKeySuffix}")
-    public ResponseEntity<String> getVidResponseEntity(@PathVariable String videoKeySuffix) {
-        String videoURL = videoService.viewVideo(videoKeySuffix);
-        return ResponseEntity.ok("Video fetched successfully: " + videoURL);
+    @GetMapping("/view/{videoID}")
+    public ResponseEntity<Map<String, Object>> getVidResponseEntity(@PathVariable Long videoID) {
+        String videoURL = videoService.viewVideo(videoID);
+        Map<String, Object> response = new HashMap<>();
+        response.put("videoId", videoID);
+        response.put("videoUrl", videoURL);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/all")

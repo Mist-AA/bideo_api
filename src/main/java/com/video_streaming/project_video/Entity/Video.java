@@ -12,11 +12,13 @@ import lombok.*;
 @Table(name = "vid_metadata")
 public class Video {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long videoId;
     private String originalVideoPath;
     private String video_url;
     private String video_title;
     private Date video_uploadDate;
-    private String encoded720pPath;
+    private String m3u8Url;
     private Long video_views;
 
     @ManyToOne

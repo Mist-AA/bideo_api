@@ -6,7 +6,6 @@ import lombok.Setter;
 @Setter
 @Getter
 public class FirebaseRefreshTokenRequest {
-    // Getters and setters
     private String grant_type;
     private String refresh_token;
 

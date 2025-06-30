@@ -38,7 +38,6 @@ public class FirebaseAuthServiceImpl implements FirebaseAuthService {
 
 
     public FirebaseToken verifyToken(String idToken) throws FirebaseAuthException {
-        // Verify the Firebase ID Token received from the client-side
         return FirebaseAuth.getInstance().verifyIdToken(idToken);
     }
 
@@ -49,7 +48,6 @@ public class FirebaseAuthServiceImpl implements FirebaseAuthService {
         HttpEntity<FirebaseSignInRequest> entity = new HttpEntity<>(request, headers);
 
         try {
-            System.out.println("RESPONSE");
 
             ResponseEntity<FirebaseSignInResponse> response = restTemplate
                     .postForEntity(getSignInUrl(), entity, FirebaseSignInResponse.class);

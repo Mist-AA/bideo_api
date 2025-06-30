@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.video_streaming.project_video.Configurations.RabbitMQConfig;
+import com.video_streaming.project_video.DTOs.MessageDTO;
 import com.video_streaming.project_video.Service.ListenerProcessService;
 import com.video_streaming.project_video.Service.VideoService;
 
@@ -23,8 +24,9 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
     private VideoService videoService;
 
     @RabbitListener(queues = RabbitMQConfig.QUEUE)
-    public void receiveVideo(String inputPath) {
-        System.out.println("🎥 Received video for processing: " + inputPath);
+    public void receiveVideo(MessageDTO message) {
+        String inputPath = message.getVideoFile();
+        Long videoID = message.getVideoID();
         long timestamp = System.currentTimeMillis();
 
         try {
@@ -34,12 +36,10 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
 
             File outputDir = new File("processed_videos");
             if (!outputDir.exists()) outputDir.mkdirs();
-            outputDir.deleteOnExit();
             
             File encodedMp4 = new File(outputDir, baseName + "_720p_" + timestamp + ".mp4");
             File hlsDir = new File(outputDir, baseName + "_hls_" + timestamp);
             if (!hlsDir.exists()) hlsDir.mkdirs();
-            hlsDir.deleteOnExit();
             
             boolean encodingSuccess = encodeTo720p(inputPath, encodedMp4);
             if (!encodingSuccess) throw new RuntimeException("MP4 encoding failed");
@@ -49,12 +49,20 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
 
             String s3Url = videoService.uploadDirectory(hlsDir, baseName + "_hls_" + timestamp);
             System.out.println("Video uploaded to S3 at: " + s3Url);
-
-            videoService.updateVideoEncodedPath(inputPath, s3Url);
+        
+            videoService.updateVideoEncodedPath(videoID, s3Url);
 
         } catch (Exception e) {
             System.err.println("Video processing/upload failed:");
             e.printStackTrace();
+        }
+        finally {
+            File outputDir = new File("processed_videos");
+            if (outputDir.exists() && outputDir.isDirectory()) {
+                for (File file : outputDir.listFiles()) {
+                    deleteRecursively(file);
+                }
+            }
         }
     }
 
@@ -119,5 +127,14 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
         } else {
             return true;
         }
+    }
+
+    private void deleteRecursively(File file) {
+        if (file.isDirectory()) {
+            for (File child : file.listFiles()) {
+                deleteRecursively(child);
+            }
+        }
+        file.delete();
     }
 }

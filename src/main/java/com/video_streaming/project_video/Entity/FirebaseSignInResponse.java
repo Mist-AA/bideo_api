@@ -6,7 +6,6 @@ import lombok.Setter;
 @Setter
 @Getter
 public class FirebaseSignInResponse {
-    // Getters and Setters
     private String idToken;
     private String refreshToken;
 
