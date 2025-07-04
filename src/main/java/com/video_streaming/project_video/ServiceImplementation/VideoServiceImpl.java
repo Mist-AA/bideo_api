@@ -15,6 +15,8 @@ import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -91,12 +93,10 @@ public class VideoServiceImpl implements VideoService {
         return s3FileURL;
     }
 
-    public List<VideoDTO> getAllVideos() {
-        List<Video> videos = videoRepository.findAll();
+    public Page<VideoDTO> getAllVideos(Pageable pageable) {
+        Page<Video> videosPage = videoRepository.findAll(pageable);
         VideoDTOMapper videoDTOMapper = new VideoDTOMapper();
-        return videos.stream()
-                .map(videoDTOMapper::convertEntityToDTO)
-                .collect(Collectors.toList());
+        return videosPage.map(videoDTOMapper::convertEntityToDTO);
     }
 
     @Transactional

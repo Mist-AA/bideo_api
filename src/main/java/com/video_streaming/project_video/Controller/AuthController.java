@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import com.video_streaming.project_video.Service.FirebaseAuthService;
 import com.video_streaming.project_video.Service.UserService;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/app")
 public class AuthController {

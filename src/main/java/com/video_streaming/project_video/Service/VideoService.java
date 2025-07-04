@@ -2,6 +2,8 @@ package com.video_streaming.project_video.Service;
 
 import com.video_streaming.project_video.DTOs.UserDTO;
 import com.video_streaming.project_video.DTOs.VideoDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.io.File;
 import java.util.List;
@@ -32,7 +34,7 @@ public interface VideoService {
      *
      * @return A list of VideoDTO objects representing the videos.
      */
-    public List<VideoDTO> getAllVideos();
+    public  Page<VideoDTO> getAllVideos(Pageable pageable);
 
 
     /**

@@ -6,6 +6,10 @@ import com.video_streaming.project_video.Service.VideoService;
 import com.video_streaming.project_video.Service.SenderProcessService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +19,6 @@ import org.apache.tika.Tika;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -80,8 +83,10 @@ public class VideoController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<VideoDTO>> getAllVideosList() {
-        List<VideoDTO> videoList = videoService.getAllVideos();
+    public ResponseEntity<Page<VideoDTO>> getAllVideosList(@RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("videoId").descending());
+        Page<VideoDTO> videoList = videoService.getAllVideos(pageable);
         return ResponseEntity.ok(videoList);
     }
 
