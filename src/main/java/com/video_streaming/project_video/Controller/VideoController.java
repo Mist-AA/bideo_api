@@ -1,6 +1,5 @@
 package com.video_streaming.project_video.Controller;
 
-import com.video_streaming.project_video.DTOs.UserDTO;
 import com.video_streaming.project_video.DTOs.VideoDTO;
 import com.video_streaming.project_video.Service.VideoService;
 import com.video_streaming.project_video.Service.SenderProcessService;

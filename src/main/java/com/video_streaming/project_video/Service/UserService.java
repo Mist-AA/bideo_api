@@ -13,5 +13,6 @@ public interface UserService {
      * @throws Exception If there is an error during user creation.
      */
     public void create(String emailId, String password, String user_name, String thumbnail_url) throws Exception;
-    public void updateUser(UserDTO userDTO);
+    public String updateUserProfile(UserDTO userDTO);
+    public UserDTO getUserById(String userId);
 }

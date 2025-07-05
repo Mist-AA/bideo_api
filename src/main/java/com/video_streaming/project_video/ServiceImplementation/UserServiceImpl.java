@@ -1,7 +1,6 @@
 package com.video_streaming.project_video.ServiceImplementation;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.video_streaming.project_video.DTOMapper.UserDTOMapper;
@@ -35,6 +34,7 @@ public class UserServiceImpl implements UserService {
         this.firebaseAuth = firebaseAuth;
     }
 
+    @Transactional
     public void create(String emailId, String password, String user_name, String thumbnail_url) throws Exception {
         CreateRequest request = new CreateRequest();
         request.setEmail(emailId);
@@ -59,13 +59,42 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public void updateUser(UserDTO userDTO) {
+    private void updateUser(UserDTO userDTO) {
         UserDTOMapper userDTOMapper = new UserDTOMapper();
         User user = userDTOMapper.convertDTOToEntity(userDTO);
         user.setUser_role(USER_ROLE_USER);
         userRepository.save(user);
-
-        ResponseEntity.ok("User updated successfully.");
     }
 
+    @Transactional
+    public String updateUserProfile(UserDTO userDTO) {
+        User user = userRepository.findByUserId(userDTO.getUserId());
+
+            if (user == null) {
+                throw new RuntimeException("User not found with ID: " + userDTO.getUserId());
+            }
+            if (userDTO.getUser_name() != null) {
+                user.setUser_name(userDTO.getUser_name());
+            }
+            if (userDTO.getUser_email() != null) {
+                user.setUser_email(userDTO.getUser_email());
+            }
+            if (userDTO.getThumbnail_url() != null) {
+                user.setThumbnail_url(userDTO.getThumbnail_url());
+            }
+            userRepository.save(user);
+
+            return "User updated successfully";
+    }
+
+    public UserDTO getUserById(String userId) {
+        UserDTOMapper userDTOMapper = new UserDTOMapper();
+        User user = userRepository.findByUserId(userId);
+
+        if (user == null) {
+            throw new RuntimeException("User not found with ID: " + userId);
+        }
+
+        return userDTOMapper.convertEntityToDTO(user);
+    }
 }

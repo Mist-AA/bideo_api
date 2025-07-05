@@ -4,5 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.video_streaming.project_video.Entity.User;
 
 public interface UserRepository extends JpaRepository<User, String> {
-    User findByUserId(String user_id); // method name is fine
+    User findByUserId(String user_id);
 }
