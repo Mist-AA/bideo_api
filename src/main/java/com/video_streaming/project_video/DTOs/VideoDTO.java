@@ -14,6 +14,6 @@ public class VideoDTO {
     private Date video_uploadDate;
     private Long video_views;
     private String m3u8Url;
-    private UserDTO video_uploader;
+    private String creatorUserId;
     
 }

@@ -12,5 +12,7 @@ public class SupportVariablesConfig {
     public static final String refreshTokenURLSuffix = "https://securetoken.googleapis.com/v1/token?key=";
     
     public static final String signInTokenURLSuffix = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=";
+
+    public static final String thumbnailURLDefault = "https://github.com/shadcn.png";
     
 }

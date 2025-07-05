@@ -20,8 +20,6 @@ public class Video {
     private Date video_uploadDate;
     private String m3u8Url;
     private Long video_views;
-
-    @ManyToOne
-    private User video_uploader;
+    private String creatorUserId;
     
 }

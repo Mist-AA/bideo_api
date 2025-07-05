@@ -43,7 +43,7 @@ public interface VideoService {
      * @param userId The ID of the uploader.
      * @return Video id of the uploaded video.
      */
-    public Long uploadVideoMetadata(String result, String videoTitle, UserDTO userDTO);
+    public Long uploadVideoMetadata(String result, String videoTitle, String userId);
 
 
     /**

@@ -1,6 +1,7 @@
 package com.video_streaming.project_video.ServiceImplementation;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.video_streaming.project_video.DTOMapper.UserDTOMapper;
@@ -15,6 +16,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.auth.UserRecord.CreateRequest;
+
+import static com.video_streaming.project_video.Configurations.SupportVariablesConfig.thumbnailURLDefault;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -32,7 +35,7 @@ public class UserServiceImpl implements UserService {
         this.firebaseAuth = firebaseAuth;
     }
 
-    public void create(String emailId, String password, String user_name) throws Exception {
+    public void create(String emailId, String password, String user_name, String thumbnail_url) throws Exception {
         CreateRequest request = new CreateRequest();
         request.setEmail(emailId);
         request.setPassword(password);
@@ -42,9 +45,10 @@ public class UserServiceImpl implements UserService {
         try {
             UserRecord userRecord = firebaseAuth.createUser(request);
             UserDTO userDTO = new UserDTO();
-            userDTO.setUser_id(userRecord.getUid());
+            userDTO.setUserId(userRecord.getUid());
             userDTO.setUser_name(userRecord.getDisplayName());
             userDTO.setUser_email(userRecord.getEmail());
+            userDTO.setThumbnail_url(thumbnail_url!=null?thumbnail_url:thumbnailURLDefault);
             updateUser(userDTO);
         } catch (FirebaseAuthException exception) {
             if (exception.getMessage().contains(DUPLICATE_ACCOUNT_ERROR)) {
@@ -55,11 +59,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    private void updateUser(UserDTO userDTO){
+    public void updateUser(UserDTO userDTO) {
         UserDTOMapper userDTOMapper = new UserDTOMapper();
         User user = userDTOMapper.convertDTOToEntity(userDTO);
         user.setUser_role(USER_ROLE_USER);
         userRepository.save(user);
+
+        ResponseEntity.ok("User updated successfully.");
     }
 
 }

@@ -7,7 +7,9 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.video_streaming.project_video.DTOMapper.VideoDTOMapper;
 import com.video_streaming.project_video.DTOs.UserDTO;
 import com.video_streaming.project_video.DTOs.VideoDTO;
+import com.video_streaming.project_video.Entity.User;
 import com.video_streaming.project_video.Entity.Video;
+import com.video_streaming.project_video.Repository.UserRepository;
 import com.video_streaming.project_video.Repository.VideoRepository;
 import com.video_streaming.project_video.Service.VideoService;
 
@@ -30,6 +32,7 @@ public class VideoServiceImpl implements VideoService {
     private final AmazonS3 amazonS3;
     @Autowired
     private VideoRepository videoRepository;
+    private UserRepository userRepository;
 
     @Value("${aws.s3.bucket}")
     private String bucketName;
@@ -100,7 +103,7 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Transactional
-    public Long uploadVideoMetadata(String result, String videoTitle, UserDTO userDTO) {
+    public Long uploadVideoMetadata(String result, String videoTitle, String userId) {
         VideoDTO videoDTO = new VideoDTO();
         VideoDTOMapper videoDTOMapper = new VideoDTOMapper();
         videoDTO.setVideo_url(null);
@@ -109,12 +112,13 @@ public class VideoServiceImpl implements VideoService {
         videoDTO.setM3u8Url(null);
         videoDTO.setVideo_views(0L);
         
-        // Testing code
-        UserDTO userDTO2 = new UserDTO();
-        userDTO2.setUser_id("9nu1abAxD0ReFFN79I6rnfcsDe22");
-        userDTO2.setUser_name("online_db");
-        userDTO2.setUser_email("test6@ok.con");
-        videoDTO.setVideo_uploader(userDTO2);
+        // Testing code : TODO get current authenticated user
+//        User updatedUser = userRepository.findByUserId(userId);
+//        UserDTO userDTO2 = new UserDTO();
+//        userDTO2.setUserId("9nu1abAxD0ReFFN79I6rnfcsDe22");
+//        userDTO2.setUser_name("online_db");
+//        userDTO2.setUser_email("test6@ok.con");
+        videoDTO.setCreatorUserId(userId);
         // End of testing code
         
         Video video = videoDTOMapper.convertDTOToEntity(videoDTO);
