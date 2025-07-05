@@ -16,6 +16,8 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.auth.UserRecord.CreateRequest;
 
+import static com.video_streaming.project_video.Configurations.SupportVariablesConfig.thumbnailURLDefault;
+
 @Service
 public class UserServiceImpl implements UserService {
     private static final String DUPLICATE_ACCOUNT_ERROR = "EMAIL_EXISTS";
@@ -32,7 +34,8 @@ public class UserServiceImpl implements UserService {
         this.firebaseAuth = firebaseAuth;
     }
 
-    public void create(String emailId, String password, String user_name) throws Exception {
+    @Transactional
+    public void create(String emailId, String password, String user_name, String thumbnail_url) throws Exception {
         CreateRequest request = new CreateRequest();
         request.setEmail(emailId);
         request.setPassword(password);
@@ -42,9 +45,10 @@ public class UserServiceImpl implements UserService {
         try {
             UserRecord userRecord = firebaseAuth.createUser(request);
             UserDTO userDTO = new UserDTO();
-            userDTO.setUser_id(userRecord.getUid());
+            userDTO.setUserId(userRecord.getUid());
             userDTO.setUser_name(userRecord.getDisplayName());
             userDTO.setUser_email(userRecord.getEmail());
+            userDTO.setThumbnail_url(thumbnail_url!=null?thumbnail_url:thumbnailURLDefault);
             updateUser(userDTO);
         } catch (FirebaseAuthException exception) {
             if (exception.getMessage().contains(DUPLICATE_ACCOUNT_ERROR)) {
@@ -55,11 +59,42 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    private void updateUser(UserDTO userDTO){
+    private void updateUser(UserDTO userDTO) {
         UserDTOMapper userDTOMapper = new UserDTOMapper();
         User user = userDTOMapper.convertDTOToEntity(userDTO);
         user.setUser_role(USER_ROLE_USER);
         userRepository.save(user);
     }
 
+    @Transactional
+    public String updateUserProfile(UserDTO userDTO) {
+        User user = userRepository.findByUserId(userDTO.getUserId());
+
+            if (user == null) {
+                throw new RuntimeException("User not found with ID: " + userDTO.getUserId());
+            }
+            if (userDTO.getUser_name() != null) {
+                user.setUser_name(userDTO.getUser_name());
+            }
+            if (userDTO.getUser_email() != null) {
+                user.setUser_email(userDTO.getUser_email());
+            }
+            if (userDTO.getThumbnail_url() != null) {
+                user.setThumbnail_url(userDTO.getThumbnail_url());
+            }
+            userRepository.save(user);
+
+            return "User updated successfully";
+    }
+
+    public UserDTO getUserById(String userId) {
+        UserDTOMapper userDTOMapper = new UserDTOMapper();
+        User user = userRepository.findByUserId(userId);
+
+        if (user == null) {
+            throw new RuntimeException("User not found with ID: " + userId);
+        }
+
+        return userDTOMapper.convertEntityToDTO(user);
+    }
 }

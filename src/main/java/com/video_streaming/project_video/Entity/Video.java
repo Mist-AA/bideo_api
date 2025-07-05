@@ -15,13 +15,12 @@ public class Video {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long videoId;
     private String originalVideoPath;
-    private String video_url;
     private String video_title;
     private Date video_uploadDate;
     private String m3u8Url;
     private Long video_views;
-
-    @ManyToOne
-    private User video_uploader;
     
+    @ManyToOne
+    @JoinColumn(name = "video_uploader_user_id", referencedColumnName = "userId")
+    private User video_uploader;
 }

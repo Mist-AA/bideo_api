@@ -11,8 +11,9 @@ import lombok.*;
 @Table(name = "user_info")
 public class User {
     @Id
-    private String user_id;
+    private String userId;
     private String user_name;
     private String user_email;
     private String user_role;
+    private String thumbnail_url;
 }

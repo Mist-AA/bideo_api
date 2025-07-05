@@ -1,6 +1,5 @@
 package com.video_streaming.project_video.Controller;
 
-import com.video_streaming.project_video.DTOs.UserDTO;
 import com.video_streaming.project_video.DTOs.VideoDTO;
 import com.video_streaming.project_video.Service.VideoService;
 import com.video_streaming.project_video.Service.SenderProcessService;
@@ -39,7 +38,7 @@ public class VideoController {
      */
     @PostMapping("/upload")
     public ResponseEntity<String> uploadVidResponseEntity(@RequestParam("file") MultipartFile videoFile, 
-                                                                                @RequestParam String videoTitle, @RequestParam(required = false) UserDTO userDTO) {
+                                                                                @RequestParam String videoTitle, @RequestParam(required = false) String userId) {
         if (videoFile.isEmpty()) {
             return ResponseEntity.badRequest().body("File is empty");
         }
@@ -57,7 +56,7 @@ public class VideoController {
             videoFile.transferTo(tempFile);
 
             String result = videoService.uploadFile(tempFile);
-            Long videoID = videoService.uploadVideoMetadata(result, videoTitle, userDTO);
+            Long videoID = videoService.uploadVideoMetadata(result, videoTitle, userId);
 
             messageSender.sendVideoPath(result, videoID);
             return ResponseEntity.ok(result);

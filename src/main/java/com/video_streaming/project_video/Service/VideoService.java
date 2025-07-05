@@ -1,12 +1,10 @@
 package com.video_streaming.project_video.Service;
 
-import com.video_streaming.project_video.DTOs.UserDTO;
 import com.video_streaming.project_video.DTOs.VideoDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.io.File;
-import java.util.List;
 
 public interface VideoService {
 
@@ -43,7 +41,7 @@ public interface VideoService {
      * @param userId The ID of the uploader.
      * @return Video id of the uploaded video.
      */
-    public Long uploadVideoMetadata(String result, String videoTitle, UserDTO userDTO);
+    public Long uploadVideoMetadata(String result, String videoTitle, String userId);
 
 
     /**
