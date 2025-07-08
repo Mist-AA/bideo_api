@@ -13,7 +13,6 @@ import com.video_streaming.project_video.Service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
-@CrossOrigin(origins = "${frontend.exposed.link}")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/app")

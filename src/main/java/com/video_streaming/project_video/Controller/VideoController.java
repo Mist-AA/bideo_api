@@ -20,7 +20,6 @@ import org.apache.tika.Tika;
 import java.io.File;
 import java.io.IOException;
 
-@CrossOrigin(origins = "${frontend.exposed.link}")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/video")
