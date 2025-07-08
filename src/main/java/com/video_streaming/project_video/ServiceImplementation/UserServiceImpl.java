@@ -1,6 +1,5 @@
 package com.video_streaming.project_video.ServiceImplementation;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.video_streaming.project_video.DTOMapper.UserDTOMapper;
@@ -8,6 +7,8 @@ import com.video_streaming.project_video.DTOs.UserDTO;
 import com.video_streaming.project_video.Entity.User;
 import com.video_streaming.project_video.Repository.UserRepository;
 import com.video_streaming.project_video.Service.UserService;
+
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,20 +20,13 @@ import com.google.firebase.auth.UserRecord.CreateRequest;
 import static com.video_streaming.project_video.Configurations.SupportVariablesConfig.thumbnailURLDefault;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private static final String DUPLICATE_ACCOUNT_ERROR = "EMAIL_EXISTS";
     private static final String USER_ROLE_USER = "USER";
 
-
     private final FirebaseAuth firebaseAuth;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    public UserServiceImpl(FirebaseAuth firebaseAuth) {
-        this.firebaseAuth = firebaseAuth;
-    }
+    private final UserRepository userRepository;
 
     @Transactional
     public void create(String emailId, String password, String user_name, String thumbnail_url) throws Exception {
@@ -59,7 +53,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    private void updateUser(UserDTO userDTO) {
+    protected void updateUser(UserDTO userDTO) {
         UserDTOMapper userDTOMapper = new UserDTOMapper();
         User user = userDTOMapper.convertDTOToEntity(userDTO);
         user.setUser_role(USER_ROLE_USER);
@@ -68,7 +62,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     public String updateUserProfile(UserDTO userDTO) {
-        User user = userRepository.findByUserId(userDTO.getUserId());
+        User user = userRepository.getReferenceById(userDTO.getUserId());
 
             if (user == null) {
                 throw new RuntimeException("User not found with ID: " + userDTO.getUserId());
@@ -89,7 +83,7 @@ public class UserServiceImpl implements UserService {
 
     public UserDTO getUserById(String userId) {
         UserDTOMapper userDTOMapper = new UserDTOMapper();
-        User user = userRepository.findByUserId(userId);
+        User user = userRepository.getReferenceById(userId);
 
         if (user == null) {
             throw new RuntimeException("User not found with ID: " + userId);

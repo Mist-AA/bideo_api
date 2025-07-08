@@ -12,7 +12,21 @@ public interface UserService {
      * @param user_name The username for the user.
      * @throws Exception If there is an error during user creation.
      */
-    public void create(String emailId, String password, String user_name, String thumbnail_url) throws Exception;
-    public String updateUserProfile(UserDTO userDTO);
-    public UserDTO getUserById(String userId);
+    void create(String emailId, String password, String user_name, String thumbnail_url) throws Exception;
+
+    /**
+     * This method is used to update the user profile with the provided UserDTO.
+     * 
+     * @param userDTO The UserDTO containing user details to be updated.
+     * @return A string indicating the result of the update operation.
+     */
+    String updateUserProfile(UserDTO userDTO);
+
+    /**
+     * This method retrieves a user by their user ID.
+     * 
+     * @param userId The ID of the user to retrieve.
+     * @return UserDTO containing user details.
+     */
+    UserDTO getUserById(String userId);
 }

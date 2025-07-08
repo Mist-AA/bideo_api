@@ -6,10 +6,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import com.video_streaming.project_video.Configurations.SupportVariablesConfig;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.video_streaming.project_video.Configurations.RabbitMQConfig;
@@ -17,11 +18,13 @@ import com.video_streaming.project_video.DTOs.MessageDTO;
 import com.video_streaming.project_video.Service.ListenerProcessService;
 import com.video_streaming.project_video.Service.VideoService;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class ListenerProcessServiceImpl implements ListenerProcessService {
 
-    @Autowired
-    private VideoService videoService;
+    private final VideoService videoService;
 
     @RabbitListener(queues = RabbitMQConfig.QUEUE)
     public void receiveVideo(MessageDTO message) {
@@ -34,7 +37,7 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
             String fileName = Paths.get(uri.getPath()).getFileName().toString();
             String baseName = fileName.replaceAll("\\.\\w+$", "");
 
-            File outputDir = new File("processed_videos");
+            File outputDir = new File(SupportVariablesConfig.processedVideosFolderPath);
             if (!outputDir.exists()) outputDir.mkdirs();
             
             File encodedMp4 = new File(outputDir, baseName + "_720p_" + timestamp + ".mp4");
@@ -54,12 +57,11 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
 
         } catch (Exception e) {
             System.err.println("Video processing/upload failed:");
-            e.printStackTrace();
         }
         finally {
-            File outputDir = new File("processed_videos");
+            File outputDir = new File(SupportVariablesConfig.processedVideosFolderPath);
             if (outputDir.exists() && outputDir.isDirectory()) {
-                for (File file : outputDir.listFiles()) {
+                for (File file : Objects.requireNonNull(outputDir.listFiles())) {
                     deleteRecursively(file);
                 }
             }
@@ -67,30 +69,13 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
     }
 
     private boolean encodeTo720p(String inputPath, File encodedMp4) throws IOException, InterruptedException {
-        ProcessBuilder builder = new ProcessBuilder(
+        ProcessBuilder encodeBuilder = new ProcessBuilder(
                 "ffmpeg", "-i", inputPath,
                 "-vf", "scale=720:480",
                 "-y",
                 encodedMp4.getAbsolutePath()
         );
-
-        builder.redirectErrorStream(true);
-        Process resConversionProcess = builder.start();
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(resConversionProcess.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // do nothing
-            }
-        }
-        
-        boolean finished = resConversionProcess.waitFor(10, TimeUnit.SECONDS);
-        if (!finished) {
-            resConversionProcess.destroyForcibly();
-            throw new RuntimeException("FFmpeg timeout");
-        } else {
-            return true;
-        }
+        return processBuilderFFmpeg(encodeBuilder);
     }
 
     private boolean convertToHLS(File encodedMp4, File hlsDir) throws IOException, InterruptedException {
@@ -109,9 +94,21 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
                 "-f", "hls",
                 playlistFile.getAbsolutePath()
         );
+        return processBuilderFFmpeg(hlsBuilder);
+    }
 
-        hlsBuilder.redirectErrorStream(true);
-        Process hlsProcess = hlsBuilder.start();
+    private void deleteRecursively(File file) {
+        if (file.isDirectory()) {
+            for (File child : Objects.requireNonNull(file.listFiles())) {
+                deleteRecursively(child);
+            }
+        }
+        file.delete();
+    }
+
+    private boolean processBuilderFFmpeg(ProcessBuilder processBuilder) throws IOException, InterruptedException {
+        processBuilder.redirectErrorStream(true);
+        Process hlsProcess = processBuilder.start();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(hlsProcess.getInputStream()))) {
             String line;
@@ -127,14 +124,5 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
         } else {
             return true;
         }
-    }
-
-    private void deleteRecursively(File file) {
-        if (file.isDirectory()) {
-            for (File child : file.listFiles()) {
-                deleteRecursively(child);
-            }
-        }
-        file.delete();
     }
 }

@@ -12,8 +12,8 @@ import com.video_streaming.project_video.Service.UserService;
 import com.video_streaming.project_video.Service.VideoService;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,22 +23,15 @@ import java.io.File;
 import java.util.Date;
 
 @Service
+@RequiredArgsConstructor
 public class VideoServiceImpl implements VideoService {
 
     private final AmazonS3 amazonS3;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private VideoRepository videoRepository;
+    private final UserService userService;
+    private final VideoRepository videoRepository;
 
     @Value("${aws.s3.bucket}")
     private String bucketName;
-
-    public VideoServiceImpl(AmazonS3 amazonS3) {
-        this.amazonS3 = amazonS3;
-    }
 
     @Override
     public String uploadFile(File file) {
@@ -53,15 +46,15 @@ public class VideoServiceImpl implements VideoService {
         } catch (AmazonServiceException ase) {
             // To do: Add logging here
             // Fix global exception handling
-            ase.printStackTrace();
+
             return "Service error uploading file: " + ase.getMessage();
         } catch (SdkClientException sce) {
             // To do: Add logging here
-            sce.printStackTrace();
+
             return "Client error uploading file: " + sce.getMessage();
         } catch (Exception e) {
             // To do: Add logging here
-            e.printStackTrace();
+
             return "Unexpected error uploading file: " + e.getMessage();
         }
     }
@@ -127,11 +120,13 @@ public class VideoServiceImpl implements VideoService {
         }
     }
 
-    public String viewVideo(Long videoID) {
-        String videoURL = videoRepository.findM3u8UrlByVideoId(videoID);
-        if (videoURL == null) {
+    public VideoDTO viewVideo(Long videoID) {
+        VideoDTOMapper videoDTOMapper = new VideoDTOMapper();
+        Video video = videoRepository.getReferenceById(videoID);
+        if (video == null) {
             throw new RuntimeException("Video not found");
         }
-        return videoURL;
+
+        return videoDTOMapper.convertEntityToDTO(video);
     }
 }

@@ -8,5 +8,5 @@ public interface SenderProcessService {
      * @param videoFile The path to the video file that needs to be sent.
      * @param videoID The ID of the video associated with the file.
      */
-    public void sendVideoPath(String videoFile, Long videoID);
+    void sendVideoPath(String videoFile, Long videoID);
 }

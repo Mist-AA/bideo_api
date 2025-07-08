@@ -2,9 +2,11 @@ package com.video_streaming.project_video.Controller;
 
 import com.video_streaming.project_video.DTOs.VideoDTO;
 import com.video_streaming.project_video.Service.VideoService;
+
+import lombok.RequiredArgsConstructor;
+
 import com.video_streaming.project_video.Service.SenderProcessService;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,25 +19,16 @@ import org.apache.tika.Tika;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
+@CrossOrigin(origins = "${frontend.exposed.link}")
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/video")
 public class VideoController {
 
-    @Autowired
-    private VideoService videoService;
+    private final VideoService videoService;
+    private final SenderProcessService messageSender;
 
-    @Autowired
-    private SenderProcessService messageSender;
-
-    /**
-     * Endpoint to upload a video file.
-     * Validates the file type and uploads it to S3.
-     * @param multipartFile The video file to upload
-     * @return ResponseEntity with the result of the upload
-     */
     @PostMapping("/upload")
     public ResponseEntity<String> uploadVidResponseEntity(@RequestParam("file") MultipartFile videoFile, 
                                                                                 @RequestParam String videoTitle, @RequestParam(required = false) String userId) {
@@ -73,12 +66,9 @@ public class VideoController {
     }
 
     @GetMapping("/view/{videoID}")
-    public ResponseEntity<Map<String, Object>> getVidResponseEntity(@PathVariable Long videoID) {
-        String videoURL = videoService.viewVideo(videoID);
-        Map<String, Object> response = new HashMap<>();
-        response.put("videoId", videoID);
-        response.put("videoUrl", videoURL);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<VideoDTO> getVidResponseEntity(@PathVariable Long videoID) {
+        VideoDTO videoDTO = videoService.viewVideo(videoID);
+        return ResponseEntity.ok(videoDTO);
     }
 
     @GetMapping("/all")

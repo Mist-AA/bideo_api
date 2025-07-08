@@ -14,8 +14,7 @@ public interface FirebaseAuthService {
      * @return A FirebaseToken object if the token is valid.
      * @throws FirebaseAuthException If the token is invalid or verification fails.
      */
-    public FirebaseToken verifyToken(String idToken) throws FirebaseAuthException;
-
+    FirebaseToken verifyToken(String idToken) throws FirebaseAuthException;
 
     /**
      * Signs in a user with email and password using Firebase Authentication.
@@ -24,8 +23,7 @@ public interface FirebaseAuthService {
      * @param password The user's password.
      * @return A FirebaseSignInResponse object containing the sign-in result.
      */
-    public FirebaseSignInResponse signInWithEmailAndPassword(String email, String password);
-    
+    FirebaseSignInResponse signInWithEmailAndPassword(String email, String password);
 
     /**
      * Refreshes the Firebase ID Token using a refresh token.
@@ -33,5 +31,5 @@ public interface FirebaseAuthService {
      * @param refreshToken The refresh token to use for refreshing the ID token.
      * @return A FirebaseRefreshTokenResponse object containing the new ID token and other details.
      */
-    public FirebaseRefreshTokenResponse refreshIdToken (String refreshToken);
+    FirebaseRefreshTokenResponse refreshIdToken (String refreshToken);
 }

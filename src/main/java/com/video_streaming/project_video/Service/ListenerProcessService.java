@@ -9,5 +9,5 @@ public interface ListenerProcessService {
      * 
      * @param message video file object containing video file path and video ID.
      */
-    public void receiveVideo(MessageDTO message);
+    void receiveVideo(MessageDTO message);
 }

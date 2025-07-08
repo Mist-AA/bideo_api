@@ -3,17 +3,18 @@ package com.video_streaming.project_video.Controller;
 import com.video_streaming.project_video.DTOs.UserDTO;
 import com.video_streaming.project_video.Service.UserService;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "${frontend.exposed.link}")
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @PostMapping("/update")
     public ResponseEntity<String> updateUser(@RequestBody UserDTO userDTO) {

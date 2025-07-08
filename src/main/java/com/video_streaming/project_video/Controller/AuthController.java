@@ -5,22 +5,22 @@ import com.google.firebase.auth.FirebaseToken;
 
 import com.video_streaming.project_video.Entity.FirebaseRefreshTokenResponse;
 import com.video_streaming.project_video.Entity.FirebaseSignInResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.video_streaming.project_video.Service.FirebaseAuthService;
 import com.video_streaming.project_video.Service.UserService;
 
-@CrossOrigin(origins = "http://localhost:3000")
+import lombok.RequiredArgsConstructor;
+
+@CrossOrigin(origins = "${frontend.exposed.link}")
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/app")
 public class AuthController {
 
-    @Autowired
-    private FirebaseAuthService firebaseAuthService;
-    @Autowired
-    private UserService userService;
+    private final FirebaseAuthService firebaseAuthService;
+    private final UserService userService;
 
     @GetMapping("/health")
     public ResponseEntity<String> healthCheck() {

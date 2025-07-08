@@ -14,8 +14,7 @@ public interface VideoService {
      * @param file The video file to be uploaded.
      * @return A string indicating the result of the upload operation.
      */
-    public String uploadFile(File file);
-
+    String uploadFile(File file);
 
     /**
      * Uploads a directory containing video files to the server.
@@ -24,16 +23,14 @@ public interface VideoService {
      * @param fileNamePrefix A prefix for the file names.
      * @return A string indicating the result of the upload operation.
      */
-    public String uploadDirectory(File directory, String fileNamePrefix);
-
+    String uploadDirectory(File directory, String fileNamePrefix);
 
     /**
      * Retrieves a list of all videos available on the server.
-     *
+     * @param pageable Information required for pagination.
      * @return A list of VideoDTO objects representing the videos.
      */
-    public  Page<VideoDTO> getAllVideos(Pageable pageable);
-
+    Page<VideoDTO> getAllVideos(Pageable pageable);
 
     /**
      * Uploads metadata for a video, including the result of the upload.
@@ -41,23 +38,21 @@ public interface VideoService {
      * @param userId The ID of the uploader.
      * @return Video id of the uploaded video.
      */
-    public Long uploadVideoMetadata(String result, String videoTitle, String userId);
-
+    Long uploadVideoMetadata(String result, String videoTitle, String userId);
 
     /**
      * Updates the encoded video path for a specific video.
      *
-     * @param originalFilePath The original file path of the video.
+     * @param videoID The ID of the video.
      * @param encodedVideoPath The new encoded video path to be set.
      */
-    public void updateVideoEncodedPath(Long videoID, String encodedVideoPath);
-
+    void updateVideoEncodedPath(Long videoID, String encodedVideoPath);
 
     /**
-     * Retrieves the URL of a video based on its key suffix.
+     * Retrieves the video information from video ID.
      *
      * @param videoID The video ID.
-     * @return A string representing the URL of the video.
+     * @return VideoDTO object for specific video ID.
      */
-    public String viewVideo(Long videoID);
+    VideoDTO viewVideo(Long videoID);
 }

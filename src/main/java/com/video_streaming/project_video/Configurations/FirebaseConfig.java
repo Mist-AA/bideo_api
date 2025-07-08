@@ -15,7 +15,7 @@ import java.io.InputStream;
 public class FirebaseConfig {
 
     public static Object firebaseAuth;
-    private InputStream serviceAccount = getClass().getResourceAsStream("/service-account.json");
+    private final InputStream serviceAccount = getClass().getResourceAsStream(SupportVariablesConfig.serviceAccountJson);
 
     @Bean
     public FirebaseApp firebaseApp() {
