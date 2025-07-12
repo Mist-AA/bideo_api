@@ -15,8 +15,8 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/update")
-    public ResponseEntity<String> updateUser(@RequestBody UserDTO userDTO) {
+    @RequestMapping(value = "/update" , method = RequestMethod.POST, consumes = { "multipart/form-data" })
+    public ResponseEntity<String> updateUser(@ModelAttribute UserDTO userDTO) {
         try {
             String response = userService.updateUserProfile(userDTO);
 
@@ -26,10 +26,10 @@ public class UserController {
         }
     }
 
-    @GetMapping("/getUser")
-    public ResponseEntity<UserDTO> getUserById(@RequestParam String user_id) {
-            UserDTO response = userService.getUserById(user_id);
-
-            return ResponseEntity.ok(response);
+    @GetMapping("/getUser/{id}")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable("id") String userId) {
+        UserDTO response = userService.getUserById(userId);
+        return ResponseEntity.ok(response);
     }
+
 }

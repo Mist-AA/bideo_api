@@ -7,7 +7,8 @@ public class SupportVariablesConfig {
             "/app/login",
             "/app/createUser",
             "/app/health",
-            "/video/view/**"
+            "/video/view/**",
+            "/app/verifyToken"
     );
 
     public static final String refreshTokenURLSuffix = "https://securetoken.googleapis.com/v1/token?key=";

@@ -35,6 +35,16 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        response.addHeader( "Access-Control-Allow-Origin", "*" );
+        response.addHeader( "Access-Control-Allow-Methods", "*" );
+        response.addHeader( "Access-Control-Allow-Headers", "*" );
+
+
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            return; // Allow preflight requests to pass through
+        }
+
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {

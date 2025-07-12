@@ -13,6 +13,9 @@ import com.video_streaming.project_video.Service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/app")
@@ -37,15 +40,22 @@ public class AuthController {
     }
 
     @PostMapping("/verifyToken")
-    public ResponseEntity<String> verifyToken(@RequestBody String idToken) {
+    public ResponseEntity<Map<String, String>> verifyToken(@RequestBody String idToken) {
         try {
             FirebaseToken decodedToken = firebaseAuthService.verifyToken(idToken);
             String uid = decodedToken.getUid();
-            return ResponseEntity.ok("Token verified successfully! UID: " + uid);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("id", uid);
+
+            return ResponseEntity.ok(response);
         } catch (FirebaseAuthException e) {
-            return ResponseEntity.status(401).body("Invalid token: " + e.getMessage());
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Invalid token: " + e.getMessage());
+            return ResponseEntity.status(401).body(error);
         }
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<FirebaseSignInResponse> login(@RequestParam String email,@RequestParam String password) {
