@@ -9,6 +9,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -21,10 +23,11 @@ import java.util.Collections;
 @Component
 public class FirebaseTokenFilter extends OncePerRequestFilter {
 
+    private static final Logger logger = LoggerFactory.getLogger(FirebaseTokenFilter.class);
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
         return SupportVariablesConfig.WHITELISTED_PATHS.stream()
                 .anyMatch(whitelistPattern -> pathMatcher.match(whitelistPattern, path));
@@ -42,7 +45,7 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
 
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
-            return; // Allow preflight requests to pass through
+            return; // To allow preflight requests to pass through
         }
 
         String authHeader = request.getHeader("Authorization");
@@ -59,11 +62,13 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (FirebaseAuthException e) {
+                logger.error(e.getMessage());
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Invalid Firebase ID token: " + e.getMessage());
                 return;
             }
         } else {
+            logger.error("Authorization header not found or invalid");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Missing or invalid Authorization header");
             return;

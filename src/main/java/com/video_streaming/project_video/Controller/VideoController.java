@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 
 import com.video_streaming.project_video.Service.SenderProcessService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,12 +27,13 @@ import java.io.IOException;
 @RequestMapping("/video")
 public class VideoController {
 
+    private static final Logger logger = LoggerFactory.getLogger(VideoController.class);
     private final VideoService videoService;
     private final SenderProcessService messageSender;
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadVidResponseEntity(@RequestParam("file") MultipartFile videoFile, 
-                                                                                @RequestParam String videoTitle, @RequestParam(required = false) String userId) {
+                                                                                @RequestParam String videoTitle, @RequestParam String userId) {
         if (videoFile.isEmpty()) {
             return ResponseEntity.badRequest().body("File is empty");
         }
@@ -54,12 +57,15 @@ public class VideoController {
             return ResponseEntity.ok(result);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to process file: " + e.getMessage());
             
         } finally {
             if (tempFile != null && tempFile.exists()) {
-                tempFile.delete();
+                boolean file_status = tempFile.delete();
+                if (!file_status) {
+                    logger.error("Temp file not deleted");
+                }
             }
         }
     }

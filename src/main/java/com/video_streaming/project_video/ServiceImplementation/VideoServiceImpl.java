@@ -14,6 +14,8 @@ import com.video_streaming.project_video.Service.VideoService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +28,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class VideoServiceImpl implements VideoService {
 
+    private static final Logger logger = LoggerFactory.getLogger(VideoServiceImpl.class);
     private final AmazonS3 amazonS3;
     private final UserService userService;
     private final VideoRepository videoRepository;
@@ -36,7 +39,8 @@ public class VideoServiceImpl implements VideoService {
     @Override
     public String uploadFile(File file) {
         if (file == null || !file.exists()) {
-            return "Error: File does not exist - " + (file != null ? file.getAbsolutePath() : "null");
+            logger.error("File does not exists");
+            return "Error: File does not exists - " + (file != null ? file.getAbsolutePath() : "null");
         }
 
         try {
@@ -44,23 +48,20 @@ public class VideoServiceImpl implements VideoService {
             amazonS3.putObject(request);
             return amazonS3.getUrl(bucketName, file.getName()).toString();
         } catch (AmazonServiceException ase) {
-            // To do: Add logging here
-            // Fix global exception handling
-
+            logger.error("Service error", ase);
             return "Service error uploading file: " + ase.getMessage();
         } catch (SdkClientException sce) {
-            // To do: Add logging here
-
+            logger.error("Client error", sce);
             return "Client error uploading file: " + sce.getMessage();
         } catch (Exception e) {
-            // To do: Add logging here
-
+            logger.error("Unexpected error", e);
             return "Unexpected error uploading file: " + e.getMessage();
         }
     }
 
     public String uploadDirectory(File directory, String fileNamePrefix) {
         if (directory == null || !directory.exists() || !directory.isDirectory()) {
+            logger.error("File does not exists or is not a directory");
             return "Error: File is not a directory - " + (directory != null ? directory.getAbsolutePath() : "null");
         }
         File[] files = directory.listFiles();
@@ -107,25 +108,20 @@ public class VideoServiceImpl implements VideoService {
         Video video = videoDTOMapper.convertDTOToEntity(videoDTO);
         video.setOriginalVideoPath(result);
         Video savedVideo = videoRepository.save(video);
-
+        logger.info("Video metadata uploaded successfully");
         return savedVideo.getVideoId();
     }
 
     @Transactional
     public void updateVideoEncodedPath(Long videoID, String encodedVideoPath) {
         Video video = videoRepository.getReferenceById(videoID);
-        if (video != null) {
-            video.setM3u8Url(encodedVideoPath);
-            videoRepository.save(video);
-        }
+        video.setM3u8Url(encodedVideoPath);
+        videoRepository.save(video);
     }
 
     public VideoDTO viewVideo(Long videoID) {
         VideoDTOMapper videoDTOMapper = new VideoDTOMapper();
         Video video = videoRepository.getReferenceById(videoID);
-        if (video == null) {
-            throw new RuntimeException("Video not found");
-        }
 
         return videoDTOMapper.convertEntityToDTO(video);
     }

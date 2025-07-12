@@ -24,7 +24,6 @@ public class SenderProcessServiceImpl implements SenderProcessService {
                 RabbitMQConfig.ROUTING_KEY,
                 message
         );
-        System.out.println("Sent: " + message);
     }
 }
 

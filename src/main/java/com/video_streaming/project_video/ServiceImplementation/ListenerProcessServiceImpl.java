@@ -10,6 +10,8 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import com.video_streaming.project_video.Configurations.SupportVariablesConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ListenerProcessServiceImpl implements ListenerProcessService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ListenerProcessServiceImpl.class);
     private final VideoService videoService;
 
     @RabbitListener(queues = RabbitMQConfig.QUEUE)
@@ -51,12 +54,11 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
             if (!hlsSuccess) throw new RuntimeException("HLS conversion failed");
 
             String s3Url = videoService.uploadDirectory(hlsDir, baseName + "_hls_" + timestamp);
-            System.out.println("Video uploaded to S3 at: " + s3Url);
-        
+            logger.info("Video uploaded to S3 at: {}", s3Url);
             videoService.updateVideoEncodedPath(videoID, s3Url);
 
         } catch (Exception e) {
-            System.err.println("Video processing/upload failed:");
+            logger.error("Video processing/upload failed:", e);
         }
         finally {
             File outputDir = new File(SupportVariablesConfig.processedVideosFolderPath);

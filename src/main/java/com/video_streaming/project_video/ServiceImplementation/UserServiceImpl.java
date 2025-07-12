@@ -1,5 +1,7 @@
 package com.video_streaming.project_video.ServiceImplementation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.video_streaming.project_video.DTOMapper.UserDTOMapper;
@@ -25,6 +27,7 @@ public class UserServiceImpl implements UserService {
     private static final String DUPLICATE_ACCOUNT_ERROR = "EMAIL_EXISTS";
     private static final String USER_ROLE_USER = "USER";
 
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     private final FirebaseAuth firebaseAuth;
     private final UserRepository userRepository;
 
@@ -43,7 +46,7 @@ public class UserServiceImpl implements UserService {
             userDTO.setUser_name(userRecord.getDisplayName());
             userDTO.setUser_email(userRecord.getEmail());
             userDTO.setThumbnail_url(thumbnail_url!=null?thumbnail_url:thumbnailURLDefault);
-            updateUser(userDTO);
+            updateUserMetadata(userDTO);
         } catch (FirebaseAuthException exception) {
             if (exception.getMessage().contains(DUPLICATE_ACCOUNT_ERROR)) {
                 throw new Exception("Account with given email-id already exists");
@@ -53,11 +56,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    protected void updateUser(UserDTO userDTO) {
+    protected void updateUserMetadata(UserDTO userDTO) {
         UserDTOMapper userDTOMapper = new UserDTOMapper();
         User user = userDTOMapper.convertDTOToEntity(userDTO);
         user.setUser_role(USER_ROLE_USER);
         userRepository.save(user);
+        logger.info("User details stored");
     }
 
     @Transactional
@@ -77,7 +81,7 @@ public class UserServiceImpl implements UserService {
                 user.setThumbnail_url(userDTO.getThumbnail_url());
             }
             userRepository.save(user);
-
+            logger.info("User details updated");
             return "User updated successfully";
     }
 

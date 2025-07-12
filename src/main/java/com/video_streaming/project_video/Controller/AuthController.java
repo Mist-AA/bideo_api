@@ -5,6 +5,8 @@ import com.google.firebase.auth.FirebaseToken;
 
 import com.video_streaming.project_video.Entity.FirebaseRefreshTokenResponse;
 import com.video_streaming.project_video.Entity.FirebaseSignInResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +23,7 @@ import java.util.Map;
 @RequestMapping("/app")
 public class AuthController {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     private final FirebaseAuthService firebaseAuthService;
     private final UserService userService;
 
@@ -30,11 +33,14 @@ public class AuthController {
     }
 
     @PostMapping("/createUser")
-    public ResponseEntity<String> createUser(@RequestParam String email, @RequestParam String password, @RequestParam String user_name, @RequestParam String thumbnail_url) {
+    public ResponseEntity<String> createUser(@RequestParam String email, @RequestParam String password,
+                                             @RequestParam String user_name, @RequestParam String thumbnail_url) {
         try {
             userService.create(email, password, user_name, thumbnail_url);
+            logger.info("Successfully created user");
             return ResponseEntity.ok("User created successfully!");
         } catch (Exception e) {
+            logger.error(e.getMessage());
             return ResponseEntity.status(400).body("Error creating user: " + e.getMessage());
         }
     }
@@ -50,6 +56,7 @@ public class AuthController {
 
             return ResponseEntity.ok(response);
         } catch (FirebaseAuthException e) {
+            logger.error(e.getMessage());
             Map<String, String> error = new HashMap<>();
             error.put("error", "Invalid token: " + e.getMessage());
             return ResponseEntity.status(401).body(error);
