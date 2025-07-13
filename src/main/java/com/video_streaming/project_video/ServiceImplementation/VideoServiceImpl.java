@@ -21,7 +21,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Date;
 
 @Service
@@ -96,7 +99,7 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Transactional
-    public Long uploadVideoMetadata(String result, String videoTitle, String userId) {
+    public Long uploadVideoMetadata(String result, String videoTitle, String userId) throws IOException {
         VideoDTO videoDTO = new VideoDTO();
         VideoDTOMapper videoDTOMapper = new VideoDTOMapper();
         videoDTO.setVideo_title(videoTitle);
@@ -104,7 +107,8 @@ public class VideoServiceImpl implements VideoService {
         videoDTO.setM3u8Url(null);
         videoDTO.setVideo_views(0L);
         videoDTO.setVideo_uploader(userService.getUserById(userId));
-        
+        videoDTO.setVideo_duration(getVideoDuration(result));
+
         Video video = videoDTOMapper.convertDTOToEntity(videoDTO);
         video.setOriginalVideoPath(result);
         Video savedVideo = videoRepository.save(video);
@@ -124,5 +128,33 @@ public class VideoServiceImpl implements VideoService {
         Video video = videoRepository.getReferenceById(videoID);
 
         return videoDTOMapper.convertEntityToDTO(video);
+    }
+
+    private String getVideoDuration(String inputPath) throws IOException {
+        ProcessBuilder pb = new ProcessBuilder(
+                "ffprobe",
+                "-v", "error",
+                "-show_entries", "format=duration",
+                "-of", "default=noprint_wrappers=1:nokey=1",
+                inputPath
+        );
+
+        Process process = pb.start();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String durationStr = reader.readLine();
+
+        try {
+            double durationInSeconds = Double.parseDouble(durationStr);
+            return formatDuration(durationInSeconds);
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Failed to parse video duration", e);
+        }
+    }
+
+    private String formatDuration(double seconds) {
+        int hours = (int) seconds / 3600;
+        int minutes = ((int) seconds % 3600) / 60;
+        int secs = (int) seconds % 60;
+        return String.format("%02d:%02d:%02d", hours, minutes, secs);
     }
 }

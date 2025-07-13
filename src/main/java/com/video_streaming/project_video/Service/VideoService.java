@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.io.File;
+import java.io.IOException;
 
 public interface VideoService {
 
@@ -38,7 +39,7 @@ public interface VideoService {
      * @param userId The ID of the uploader.
      * @return Video id of the uploaded video.
      */
-    Long uploadVideoMetadata(String result, String videoTitle, String userId);
+    Long uploadVideoMetadata(String result, String videoTitle, String userId) throws IOException;
 
     /**
      * Updates the encoded video path for a specific video.

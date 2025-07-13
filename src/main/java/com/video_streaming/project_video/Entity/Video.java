@@ -19,6 +19,7 @@ public class Video {
     private Date video_uploadDate;
     private String m3u8Url;
     private Long video_views;
+    private String video_duration;
     
     @ManyToOne
     @JoinColumn(name = "video_uploader_user_id", referencedColumnName = "userId")

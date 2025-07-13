@@ -12,6 +12,7 @@ public class VideoDTOMapper {
         videoDTO.setVideo_title(video.getVideo_title());
         videoDTO.setVideo_uploadDate(video.getVideo_uploadDate());
         videoDTO.setVideo_views(video.getVideo_views());
+        videoDTO.setVideo_duration(video.getVideo_duration());
 
         UserDTOMapper userDTOMapper = new UserDTOMapper();
         videoDTO.setVideo_uploader(userDTOMapper.convertEntityToDTO(video.getVideo_uploader()));
@@ -26,6 +27,7 @@ public class VideoDTOMapper {
         video.setVideo_title(videoDTO.getVideo_title());
         video.setVideo_uploadDate(videoDTO.getVideo_uploadDate());
         video.setVideo_views(videoDTO.getVideo_views());
+        video.setVideo_duration(videoDTO.getVideo_duration());
 
         UserDTOMapper userDTOMapper = new UserDTOMapper();
         video.setVideo_uploader(userDTOMapper.convertDTOToEntity(videoDTO.getVideo_uploader()));

@@ -14,5 +14,5 @@ public class VideoDTO {
     private Long video_views;
     private String m3u8Url;
     private UserDTO video_uploader;
-    
+    private String video_duration;
 }
