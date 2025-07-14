@@ -9,13 +9,23 @@ services:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
 
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
   app:
     image: project_video
-    container_name: video_streaming
+    container_name: bideo_api
     ports:
       - "8080:8080"
     depends_on:
       - rabbitmq
+      - redis
     environment:
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379

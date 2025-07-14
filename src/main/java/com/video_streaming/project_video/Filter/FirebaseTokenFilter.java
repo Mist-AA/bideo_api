@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,8 @@ import java.util.Collections;
 @Component
 public class FirebaseTokenFilter extends OncePerRequestFilter {
 
+    @Value("${frontend.exposed.link}")
+    private String frontendOrigin;
     private static final Logger logger = LoggerFactory.getLogger(FirebaseTokenFilter.class);
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 
@@ -38,10 +41,8 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        response.addHeader( "Access-Control-Allow-Origin", "*" );
-        response.addHeader( "Access-Control-Allow-Methods", "*" );
-        response.addHeader( "Access-Control-Allow-Headers", "*" );
-
+        response.addHeader( "Access-Control-Allow-Origin", frontendOrigin);
+        response.addHeader( "Access-Control-Allow-Headers", "*");
 
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
