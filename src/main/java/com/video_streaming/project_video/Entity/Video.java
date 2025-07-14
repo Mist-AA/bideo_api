@@ -1,6 +1,8 @@
 package com.video_streaming.project_video.Entity;
 
 import java.util.Date;
+
+import com.video_streaming.project_video.Enums.VideoStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,6 +23,10 @@ public class Video {
     private Long video_views;
     private String video_duration;
     private String thumbnail_url;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private VideoStatus videoStatus =  VideoStatus.PENDING;
     
     @ManyToOne
     @JoinColumn(name = "video_uploader_user_id", referencedColumnName = "userId")

@@ -8,6 +8,7 @@ import com.video_streaming.project_video.Configurations.SupportVariablesConfig;
 import com.video_streaming.project_video.DTOMapper.VideoDTOMapper;
 import com.video_streaming.project_video.DTOs.VideoDTO;
 import com.video_streaming.project_video.Entity.Video;
+import com.video_streaming.project_video.Enums.VideoStatus;
 import com.video_streaming.project_video.Repository.VideoRepository;
 import com.video_streaming.project_video.Service.UserService;
 import com.video_streaming.project_video.Service.VideoService;
@@ -118,6 +119,7 @@ public class VideoServiceImpl implements VideoService {
         videoDTO.setVideo_views(0L);
         videoDTO.setVideo_uploader(userService.getUserById(userId));
         videoDTO.setVideo_duration(getVideoDuration(result));
+        videoDTO.setVideoStatus(VideoStatus.PROCESSING);
 
         Video video = videoDTOMapper.convertDTOToEntity(videoDTO);
         video.setOriginalVideoPath(result);
@@ -131,6 +133,7 @@ public class VideoServiceImpl implements VideoService {
         Video video = videoRepository.getReferenceById(videoID);
         video.setM3u8Url(encodedVideoPath);
         video.setThumbnail_url(s3ThumbnailURL);
+        video.setVideoStatus(VideoStatus.COMPLETED);
         videoRepository.save(video);
     }
 
