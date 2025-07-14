@@ -115,7 +115,7 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(hlsProcess.getInputStream()))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                // do nothing
+                logger.info("[FFmpeg log]: {}", line);
             }
         }
 

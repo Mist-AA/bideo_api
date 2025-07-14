@@ -4,6 +4,7 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.video_streaming.project_video.Configurations.SupportVariablesConfig;
 import com.video_streaming.project_video.DTOMapper.VideoDTOMapper;
 import com.video_streaming.project_video.DTOs.VideoDTO;
 import com.video_streaming.project_video.Entity.Video;
@@ -19,12 +20,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.Duration;
 import java.util.Date;
 
 @Service
@@ -35,6 +38,9 @@ public class VideoServiceImpl implements VideoService {
     private final AmazonS3 amazonS3;
     private final UserService userService;
     private final VideoRepository videoRepository;
+    private final RedisTemplate<String, VideoDTO> videoRedisTemplate;
+
+    private static final Duration VIDEO_CACHE_TTL = Duration.ofMinutes(SupportVariablesConfig.cacheTTLMinutes);
 
     @Value("${aws.s3.bucket}")
     private String bucketName;
@@ -123,11 +129,20 @@ public class VideoServiceImpl implements VideoService {
         videoRepository.save(video);
     }
 
+    @Override
     public VideoDTO viewVideo(Long videoID) {
+        String redisKey = "video:" + videoID;
+
+        VideoDTO cached = videoRedisTemplate.opsForValue().get(redisKey);
+        if (cached != null) {
+            return cached;
+        }
         VideoDTOMapper videoDTOMapper = new VideoDTOMapper();
         Video video = videoRepository.getReferenceById(videoID);
 
-        return videoDTOMapper.convertEntityToDTO(video);
+        VideoDTO videoDTO = videoDTOMapper.convertEntityToDTO(video);
+        videoRedisTemplate.opsForValue().set(redisKey, videoDTO, VIDEO_CACHE_TTL);
+        return videoDTO;
     }
 
     private String getVideoDuration(String inputPath) throws IOException {

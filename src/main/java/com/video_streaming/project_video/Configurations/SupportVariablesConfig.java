@@ -21,4 +21,5 @@ public class SupportVariablesConfig {
 
     public static final String processedVideosFolderPath = "processed_videos";
     
+    public static final int cacheTTLMinutes = 30;
 }
