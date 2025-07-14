@@ -68,10 +68,10 @@ public class VideoServiceImpl implements VideoService {
         }
     }
 
-    public String uploadDirectory(File directory, String fileNamePrefix) {
+    public String[] uploadDirectory(File directory, String fileNamePrefix) {
         if (directory == null || !directory.exists() || !directory.isDirectory()) {
             logger.error("File does not exists or is not a directory");
-            return "Error: File is not a directory - " + (directory != null ? directory.getAbsolutePath() : "null");
+            return new String[]{"Error: File is not a directory - ", (directory != null ? directory.getAbsolutePath() : "null")};
         }
         File[] files = directory.listFiles();
         if (files == null || files.length == 0) {
@@ -79,6 +79,7 @@ public class VideoServiceImpl implements VideoService {
         }
 
         String s3FileURL = null;
+        String s3ThumbnailURL = null;
 
         for (File file : files) {
             String filenameString = fileNamePrefix + "/" + file.getName();
@@ -89,13 +90,16 @@ public class VideoServiceImpl implements VideoService {
             if (file.getName().endsWith(".m3u8")) {
                 s3FileURL = amazonS3.getUrl(bucketName, filenameString).toString();
             }
+
+            if (file.getName().endsWith(".webp")) {
+                s3ThumbnailURL = amazonS3.getUrl(bucketName, filenameString).toString();
+            }
         }
 
         if (s3FileURL == null) {
             throw new RuntimeException(".m3u8 file not found in directory: " + directory.getAbsolutePath());
         }
-
-        return s3FileURL;
+        return new String[]{ s3FileURL, s3ThumbnailURL };
     }
 
     public Page<VideoDTO> getAllVideos(Pageable pageable) {
@@ -123,9 +127,10 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Transactional
-    public void updateVideoEncodedPath(Long videoID, String encodedVideoPath) {
+    public void updateVideoEncodedPath(Long videoID, String encodedVideoPath, String s3ThumbnailURL) {
         Video video = videoRepository.getReferenceById(videoID);
         video.setM3u8Url(encodedVideoPath);
+        video.setThumbnail_url(s3ThumbnailURL);
         videoRepository.save(video);
     }
 

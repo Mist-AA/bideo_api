@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void create(String emailId, String password, String user_name, String thumbnail_url) throws Exception {
+    public void create(String emailId, String password, String user_name, String avatar_url) throws Exception {
         CreateRequest request = new CreateRequest();
         request.setEmail(emailId);
         request.setPassword(password);
@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
             userDTO.setUserId(userRecord.getUid());
             userDTO.setUser_name(userRecord.getDisplayName());
             userDTO.setUser_email(userRecord.getEmail());
-            userDTO.setThumbnail_url(thumbnail_url!=null?thumbnail_url:thumbnailURLDefault);
+            userDTO.setAvatar_url(avatar_url!=null?avatar_url:thumbnailURLDefault);
             updateUserMetadata(userDTO);
         } catch (FirebaseAuthException exception) {
             if (exception.getMessage().contains(DUPLICATE_ACCOUNT_ERROR)) {
@@ -77,8 +77,8 @@ public class UserServiceImpl implements UserService {
             if (userDTO.getUser_email() != null) {
                 user.setUser_email(userDTO.getUser_email());
             }
-            if (userDTO.getThumbnail_url() != null) {
-                user.setThumbnail_url(userDTO.getThumbnail_url());
+            if (userDTO.getAvatar_url() != null) {
+                user.setAvatar_url(userDTO.getAvatar_url());
             }
             userRepository.save(user);
             logger.info("User details updated");

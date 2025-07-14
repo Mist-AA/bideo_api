@@ -10,6 +10,6 @@ public class UserDTO {
     private String userId;
     private String user_name;
     private String user_email;
-    private String thumbnail_url;
+    private String avatar_url;
     
 }

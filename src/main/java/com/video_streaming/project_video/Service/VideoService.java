@@ -22,9 +22,9 @@ public interface VideoService {
      *
      * @param directory The directory containing video files.
      * @param fileNamePrefix A prefix for the file names.
-     * @return A string indicating the result of the upload operation.
+     * @return Strings for m3u8 file and thumbnail url indicating the result of the upload operation.
      */
-    String uploadDirectory(File directory, String fileNamePrefix);
+    String[] uploadDirectory(File directory, String fileNamePrefix);
 
     /**
      * Retrieves a list of all videos available on the server.
@@ -46,8 +46,9 @@ public interface VideoService {
      *
      * @param videoID The ID of the video.
      * @param encodedVideoPath The new encoded video path to be set.
+     * @param s3ThumbnailURL The path for thumbnail of video to be set.
      */
-    void updateVideoEncodedPath(Long videoID, String encodedVideoPath);
+    void updateVideoEncodedPath(Long videoID, String encodedVideoPath, String s3ThumbnailURL);
 
     /**
      * Retrieves the video information from video ID.

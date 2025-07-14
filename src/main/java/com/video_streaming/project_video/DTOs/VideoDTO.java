@@ -15,4 +15,5 @@ public class VideoDTO {
     private String m3u8Url;
     private UserDTO video_uploader;
     private String video_duration;
+    private String thumbnail_url;
 }

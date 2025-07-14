@@ -10,9 +10,10 @@ public interface UserService {
      * @param emailId The email ID of the user.
      * @param password The password for the user.
      * @param user_name The username for the user.
+     * @param avatar_url The avatar url for the user.
      * @throws Exception If there is an error during user creation.
      */
-    void create(String emailId, String password, String user_name, String thumbnail_url) throws Exception;
+    void create(String emailId, String password, String user_name, String avatar_url) throws Exception;
 
     /**
      * This method is used to update the user profile with the provided UserDTO.

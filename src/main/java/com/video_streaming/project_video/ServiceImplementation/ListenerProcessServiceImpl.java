@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -46,6 +46,11 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
             File encodedMp4 = new File(outputDir, baseName + "_720p_" + timestamp + ".mp4");
             File hlsDir = new File(outputDir, baseName + "_hls_" + timestamp);
             if (!hlsDir.exists()) hlsDir.mkdirs();
+
+            File outputImagePath = new File(outputDir, baseName + "thumbnail" + ".webp");
+            File generatedThumbnail = generateThumbnailFromVideo(inputPath, outputImagePath);
+            Path targetPath = Paths.get(hlsDir.getAbsolutePath(), generatedThumbnail.getName());
+            Files.move(generatedThumbnail.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
             
             boolean encodingSuccess = encodeTo720p(inputPath, encodedMp4);
             if (!encodingSuccess) throw new RuntimeException("MP4 encoding failed");
@@ -53,9 +58,11 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
             boolean hlsSuccess = convertToHLS(encodedMp4, hlsDir);
             if (!hlsSuccess) throw new RuntimeException("HLS conversion failed");
 
-            String s3Url = videoService.uploadDirectory(hlsDir, baseName + "_hls_" + timestamp);
-            logger.info("Video uploaded to S3 at: {}", s3Url);
-            videoService.updateVideoEncodedPath(videoID, s3Url);
+            String[] s3Info = videoService.uploadDirectory(hlsDir, baseName + "_hls_" + timestamp);
+            String s3URL = s3Info[0];
+            String s3ThumbnailURL = s3Info[1];
+            logger.info("Video uploaded to S3 at: {}", s3URL);
+            videoService.updateVideoEncodedPath(videoID, s3URL, s3ThumbnailURL);
 
         } catch (Exception e) {
             logger.error("Video processing/upload failed:", e);
@@ -70,6 +77,19 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
         }
     }
 
+    private File generateThumbnailFromVideo(String inputVideoPath, File outputImagePath) throws IOException, InterruptedException {
+        ProcessBuilder thumbnailBuilder = new ProcessBuilder(
+            "ffmpeg",
+            "-i", inputVideoPath,
+            "-vf", "thumbnail,scale=320:180",
+            "-frames:v", "1",
+            outputImagePath.getAbsolutePath()
+        );
+
+        processBuilderFFmpeg(thumbnailBuilder);
+        return outputImagePath;
+    }
+    
     private boolean encodeTo720p(String inputPath, File encodedMp4) throws IOException, InterruptedException {
         ProcessBuilder encodeBuilder = new ProcessBuilder(
                 "ffmpeg", "-i", inputPath,

@@ -20,6 +20,7 @@ public class Video {
     private String m3u8Url;
     private Long video_views;
     private String video_duration;
+    private String thumbnail_url;
     
     @ManyToOne
     @JoinColumn(name = "video_uploader_user_id", referencedColumnName = "userId")

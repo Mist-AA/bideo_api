@@ -10,7 +10,7 @@ public class UserDTOMapper {
             userDTO.setUserId(user.getUserId());
             userDTO.setUser_name(user.getUser_name());
             userDTO.setUser_email(user.getUser_email());
-            userDTO.setThumbnail_url(user.getThumbnail_url());
+            userDTO.setAvatar_url(user.getAvatar_url());
             
             return userDTO;
     }
@@ -20,7 +20,7 @@ public class UserDTOMapper {
             user.setUserId(userDTO.getUserId());
             user.setUser_name(userDTO.getUser_name());
             user.setUser_email(userDTO.getUser_email());
-            user.setThumbnail_url(userDTO.getThumbnail_url());
+            user.setAvatar_url(userDTO.getAvatar_url());
             
             return user;
     }

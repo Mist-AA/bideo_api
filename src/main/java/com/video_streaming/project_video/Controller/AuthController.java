@@ -34,9 +34,9 @@ public class AuthController {
 
     @PostMapping("/createUser")
     public ResponseEntity<String> createUser(@RequestParam String email, @RequestParam String password,
-                                             @RequestParam String user_name, @RequestParam String thumbnail_url) {
+                                             @RequestParam String user_name, @RequestParam String avatar_url) {
         try {
-            userService.create(email, password, user_name, thumbnail_url);
+            userService.create(email, password, user_name, avatar_url);
             logger.info("Successfully created user");
             return ResponseEntity.ok("User created successfully!");
         } catch (Exception e) {

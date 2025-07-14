@@ -15,5 +15,5 @@ public class User {
     private String user_name;
     private String user_email;
     private String user_role;
-    private String thumbnail_url;
+    private String avatar_url;
 }
