@@ -9,7 +9,6 @@ import java.nio.file.*;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import com.video_streaming.project_video.Configurations.SupportVariablesConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -21,6 +20,8 @@ import com.video_streaming.project_video.Service.ListenerProcessService;
 import com.video_streaming.project_video.Service.VideoService;
 
 import lombok.RequiredArgsConstructor;
+
+import static com.video_streaming.project_video.Enums.SupportVariables.processedVideosFolderPath;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +41,7 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
             String fileName = Paths.get(uri.getPath()).getFileName().toString();
             String baseName = fileName.replaceAll("\\.\\w+$", "");
 
-            File outputDir = new File(SupportVariablesConfig.processedVideosFolderPath);
+            File outputDir = new File(processedVideosFolderPath);
             if (!outputDir.exists()) outputDir.mkdirs();
             
             File encodedMp4 = new File(outputDir, baseName + "_720p_" + timestamp + ".mp4");
@@ -68,7 +69,7 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
             logger.error("Video processing/upload failed:", e);
         }
         finally {
-            File outputDir = new File(SupportVariablesConfig.processedVideosFolderPath);
+            File outputDir = new File(processedVideosFolderPath);
             if (outputDir.exists() && outputDir.isDirectory()) {
                 for (File file : Objects.requireNonNull(outputDir.listFiles())) {
                     deleteRecursively(file);

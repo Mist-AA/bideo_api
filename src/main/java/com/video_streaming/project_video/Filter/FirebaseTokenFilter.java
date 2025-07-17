@@ -3,7 +3,6 @@ package com.video_streaming.project_video.Filter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
-import com.video_streaming.project_video.Configurations.SupportVariablesConfig;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,6 +20,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collections;
 
+import static com.video_streaming.project_video.Enums.SupportVariables.WHITELISTED_PATHS;
+
 @Component
 public class FirebaseTokenFilter extends OncePerRequestFilter {
 
@@ -32,7 +33,7 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
-        return SupportVariablesConfig.WHITELISTED_PATHS.stream()
+        return WHITELISTED_PATHS.stream()
                 .anyMatch(whitelistPattern -> pathMatcher.match(whitelistPattern, path));
     }
 

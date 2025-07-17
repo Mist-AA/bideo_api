@@ -19,7 +19,7 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.auth.UserRecord.CreateRequest;
 
-import static com.video_streaming.project_video.Configurations.SupportVariablesConfig.thumbnailURLDefault;
+import static com.video_streaming.project_video.Enums.SupportVariables.thumbnailURLDefault;
 
 @Service
 @RequiredArgsConstructor

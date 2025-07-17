@@ -11,11 +11,13 @@ import org.springframework.context.annotation.Configuration;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static com.video_streaming.project_video.Enums.SupportVariables.serviceAccountJson;
+
 @Configuration
 public class FirebaseConfig {
 
     public static Object firebaseAuth;
-    private final InputStream serviceAccount = getClass().getResourceAsStream(SupportVariablesConfig.serviceAccountJson);
+    private final InputStream serviceAccount = getClass().getResourceAsStream(serviceAccountJson);
 
     @Bean
     public FirebaseApp firebaseApp() {

@@ -4,7 +4,6 @@ package com.video_streaming.project_video.ServiceImplementation;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
-import com.video_streaming.project_video.Configurations.SupportVariablesConfig;
 import com.video_streaming.project_video.Entity.FirebaseRefreshTokenRequest;
 import com.video_streaming.project_video.Entity.FirebaseRefreshTokenResponse;
 import com.video_streaming.project_video.Entity.FirebaseSignInRequest;
@@ -16,10 +15,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.stereotype.Service;
 
-
-import org.springframework.web.client.HttpClientErrorException;
+import static com.video_streaming.project_video.Enums.SupportVariables.refreshTokenURLSuffix;
+import static com.video_streaming.project_video.Enums.SupportVariables.signInTokenURLSuffix;
 
 @Service
 public class FirebaseAuthServiceImpl implements FirebaseAuthService {
@@ -29,11 +29,11 @@ public class FirebaseAuthServiceImpl implements FirebaseAuthService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     private String getSignInUrl() {
-        return SupportVariablesConfig.signInTokenURLSuffix + FIREBASE_API_KEY;
+        return signInTokenURLSuffix + FIREBASE_API_KEY;
     }
 
     private String getRefreshTokenURL(){
-        return SupportVariablesConfig.refreshTokenURLSuffix + FIREBASE_API_KEY;
+        return refreshTokenURLSuffix + FIREBASE_API_KEY;
     }
 
 

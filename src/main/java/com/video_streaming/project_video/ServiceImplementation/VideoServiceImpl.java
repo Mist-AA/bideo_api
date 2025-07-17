@@ -4,7 +4,6 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.video_streaming.project_video.Configurations.SupportVariablesConfig;
 import com.video_streaming.project_video.DTOMapper.VideoDTOMapper;
 import com.video_streaming.project_video.DTOs.VideoDTO;
 import com.video_streaming.project_video.Entity.Video;
@@ -31,6 +30,8 @@ import java.io.InputStreamReader;
 import java.time.Duration;
 import java.util.Date;
 
+import static com.video_streaming.project_video.Enums.SupportVariables.cacheTTLMinutes;
+
 @Service
 @RequiredArgsConstructor
 public class VideoServiceImpl implements VideoService {
@@ -41,7 +42,7 @@ public class VideoServiceImpl implements VideoService {
     private final VideoRepository videoRepository;
     private final RedisTemplate<String, VideoDTO> videoRedisTemplate;
 
-    private static final Duration VIDEO_CACHE_TTL = Duration.ofMinutes(SupportVariablesConfig.cacheTTLMinutes);
+    private static final Duration VIDEO_CACHE_TTL = Duration.ofMinutes(cacheTTLMinutes);
 
     @Value("${aws.s3.bucket}")
     private String bucketName;
