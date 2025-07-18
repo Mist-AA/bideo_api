@@ -18,7 +18,7 @@ public interface SupportVariables {
 
     String thumbnailURLDefault = "https://github.com/shadcn.png";
 
-    String serviceAccountJson = "/service-account.json";
+    String serviceAccountJson = "/app/secrets/service-account.json";
 
     String processedVideosFolderPath = "processed_videos";
     

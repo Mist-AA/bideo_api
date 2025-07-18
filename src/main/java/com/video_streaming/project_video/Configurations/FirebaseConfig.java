@@ -8,6 +8,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -17,12 +19,13 @@ import static com.video_streaming.project_video.Enums.SupportVariables.serviceAc
 public class FirebaseConfig {
 
     public static Object firebaseAuth;
-    private final InputStream serviceAccount = getClass().getResourceAsStream(serviceAccountJson);
+    private final InputStream serviceAccount = new FileInputStream(serviceAccountJson);
+
+    public FirebaseConfig() throws FileNotFoundException {}
 
     @Bean
     public FirebaseApp firebaseApp() {
         try {
-            assert serviceAccount != null;
             FirebaseOptions firebaseOptions = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
