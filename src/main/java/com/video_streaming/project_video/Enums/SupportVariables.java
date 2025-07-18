@@ -8,8 +8,8 @@ public interface SupportVariables {
             "/app/createUser",
             "/app/login",
             "/app/verifyToken",
-            "/video/view/**",
-            "/video/all"
+            "/vid/view/**",
+            "/vid/all"
     );
 
     String refreshTokenURLSuffix = "https://securetoken.googleapis.com/v1/token?key=";
@@ -22,5 +22,5 @@ public interface SupportVariables {
 
     String processedVideosFolderPath = "processed_videos";
     
-    int cacheTTLMinutes = 30;
+    int cacheTTLMinutes = 3;
 }

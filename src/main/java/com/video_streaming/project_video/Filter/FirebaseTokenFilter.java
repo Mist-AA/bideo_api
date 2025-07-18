@@ -44,6 +44,7 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
 
         response.addHeader( "Access-Control-Allow-Origin", frontendOrigin);
         response.addHeader( "Access-Control-Allow-Headers", "*");
+        response.setHeader("Access-Control-Allow-Methods", "*");
 
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);

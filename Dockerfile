@@ -13,7 +13,7 @@ EXPOSE 8080
 ARG JAR_FILE=target/project_video-0.0.1-SNAPSHOT.jar
 ADD ${JAR_FILE} app.jar
 
-RUN apk add --no-cache gettext
+RUN apk update && apk add --no-cache ffmpeg gettext
 
 COPY entrypoint.sh /entrypoint.sh
 COPY service-account.template.json /app/secrets/service-account.template.json
