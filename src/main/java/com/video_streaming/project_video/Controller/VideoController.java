@@ -24,7 +24,7 @@ import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/vid")
+@RequestMapping("/api/vid")
 public class VideoController {
 
     private static final Logger logger = LoggerFactory.getLogger(VideoController.class);
