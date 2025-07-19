@@ -4,12 +4,12 @@ import java.util.List;
 
 public interface SupportVariables {
     List<String> WHITELISTED_PATHS = List.of(
-            "/app/health",
-            "/app/createUser",
-            "/app/login",
-            "/app/verifyToken",
-            "/vid/view/**",
-            "/vid/all"
+            "/api/app/health",
+            "/api/app/createUser",
+            "/api/app/login",
+            "/api/app/verifyToken",
+            "/api/vid/view/**",
+            "/api/vid/all"
     );
 
     String refreshTokenURLSuffix = "https://securetoken.googleapis.com/v1/token?key=";
