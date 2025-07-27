@@ -1,6 +1,7 @@
 package com.video_streaming.project_video.Controller;
 
 import com.video_streaming.project_video.DTOs.UserDTO;
+import com.video_streaming.project_video.Service.FirebaseAuthService;
 import com.video_streaming.project_video.Service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
 
-    @RequestMapping(value = "/update" , method = RequestMethod.POST, consumes = { "multipart/form-data" })
+    @RequestMapping(value = "/update", method = RequestMethod.POST, consumes = { "multipart/form-data" })
     public ResponseEntity<String> updateUser(@ModelAttribute UserDTO userDTO) {
         try {
             String response = userService.updateUserProfile(userDTO);
@@ -34,6 +35,11 @@ public class UserController {
     public ResponseEntity<UserDTO> getUserById(@PathVariable("id") String userId) {
         UserDTO response = userService.getUserById(userId);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/reset")
+    public ResponseEntity<?> resetUser(@RequestParam("email") String email){
+        return FirebaseAuthService.sendPasswordResetEmail(email);
     }
 
 }

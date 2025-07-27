@@ -1,6 +1,5 @@
 package com.video_streaming.project_video.ServiceImplementation;
 
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
@@ -20,6 +19,10 @@ import org.springframework.stereotype.Service;
 
 import static com.video_streaming.project_video.Enums.SupportVariables.refreshTokenURLSuffix;
 import static com.video_streaming.project_video.Enums.SupportVariables.signInTokenURLSuffix;
+import static com.video_streaming.project_video.Enums.SupportVariables.resetUserURLSuffix;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class FirebaseAuthServiceImpl implements FirebaseAuthService {
@@ -32,10 +35,13 @@ public class FirebaseAuthServiceImpl implements FirebaseAuthService {
         return signInTokenURLSuffix + FIREBASE_API_KEY;
     }
 
-    private String getRefreshTokenURL(){
+    private String getRefreshTokenURL() {
         return refreshTokenURLSuffix + FIREBASE_API_KEY;
     }
 
+    private String getResetUserURL() {
+        return resetUserURLSuffix + FIREBASE_API_KEY;
+    }
 
     public FirebaseToken verifyToken(String idToken) throws FirebaseAuthException {
         return FirebaseAuth.getInstance().verifyIdToken(idToken);
@@ -76,6 +82,26 @@ public class FirebaseAuthServiceImpl implements FirebaseAuthService {
             return response.getBody();
         } catch (HttpClientErrorException e) {
             throw new RuntimeException("Token refresh failed: " + e.getResponseBodyAsString());
+        }
+    }
+
+    public ResponseEntity<?> sendPasswordResetEmail(String email) {
+        String url = getResetUserURL();
+
+        // Build the payload
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("requestType", "PASSWORD_RESET");
+        payload.put("email", email);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(payload, headers);
+
+        try {
+            return restTemplate.postForEntity(url, requestEntity, Void.class);
+        } catch (HttpClientErrorException e) {
+            throw new RuntimeException("Failed to send password reset email: " + e.getResponseBodyAsString());
         }
     }
 

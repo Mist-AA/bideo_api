@@ -1,5 +1,7 @@
 package com.video_streaming.project_video.Service;
 
+import org.springframework.http.ResponseEntity;
+
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import com.video_streaming.project_video.Entity.FirebaseRefreshTokenResponse;
@@ -32,4 +34,15 @@ public interface FirebaseAuthService {
      * @return A FirebaseRefreshTokenResponse object containing the new ID token and other details.
      */
     FirebaseRefreshTokenResponse refreshIdToken (String refreshToken);
+
+    /**
+     * Reset the Firebase Create User Password.
+     *
+     * @param email send email id for user you want to reset.
+     */
+
+     static ResponseEntity<?> sendPasswordResetEmail(String email) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'sendPasswordResetEmail'");
+    }
 }

@@ -21,6 +21,8 @@ public interface SupportVariables {
     
     String signInTokenURLSuffix = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=";
 
+    String resetUserURLSuffix = "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=";
+
     String thumbnailURLDefault = "https://github.com/shadcn.png";
 
     String serviceAccountJson = "/app/secrets/service-account.json";
