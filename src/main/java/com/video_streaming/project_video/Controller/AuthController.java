@@ -76,7 +76,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/reset")
+    @PostMapping("/reset")
     public ResponseEntity<String> resetUser(@RequestParam("email") String email){
         return firebaseAuthService.sendPasswordResetEmail(email);
     }
