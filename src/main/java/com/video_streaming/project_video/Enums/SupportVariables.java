@@ -8,6 +8,7 @@ public interface SupportVariables {
         "/api/app/createUser",
         "/api/app/login",
         "/api/app/verifyToken",
+        "/api/app/reset",
         "/api/vid/view/**",
         "/api/vid/all"
     );

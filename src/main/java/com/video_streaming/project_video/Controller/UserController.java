@@ -1,7 +1,6 @@
 package com.video_streaming.project_video.Controller;
 
 import com.video_streaming.project_video.DTOs.UserDTO;
-import com.video_streaming.project_video.Service.FirebaseAuthService;
 import com.video_streaming.project_video.Service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -36,10 +35,4 @@ public class UserController {
         UserDTO response = userService.getUserById(userId);
         return ResponseEntity.ok(response);
     }
-
-    @GetMapping("/reset")
-    public ResponseEntity<?> resetUser(@RequestParam("email") String email){
-        return FirebaseAuthService.sendPasswordResetEmail(email);
-    }
-
 }

@@ -39,10 +39,7 @@ public interface FirebaseAuthService {
      * Reset the Firebase Create User Password.
      *
      * @param email send email id for user you want to reset.
+     * @return A ResponseEntity with status of reset password request.
      */
-
-     static ResponseEntity<?> sendPasswordResetEmail(String email) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'sendPasswordResetEmail'");
-    }
+    ResponseEntity<String> sendPasswordResetEmail(String email);
 }

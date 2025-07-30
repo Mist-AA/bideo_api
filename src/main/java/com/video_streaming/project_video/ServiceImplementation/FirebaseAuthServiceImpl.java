@@ -85,10 +85,9 @@ public class FirebaseAuthServiceImpl implements FirebaseAuthService {
         }
     }
 
-    public ResponseEntity<?> sendPasswordResetEmail(String email) {
+    public ResponseEntity<String> sendPasswordResetEmail(String email) {
         String url = getResetUserURL();
 
-        // Build the payload
         Map<String, Object> payload = new HashMap<>();
         payload.put("requestType", "PASSWORD_RESET");
         payload.put("email", email);
@@ -99,7 +98,7 @@ public class FirebaseAuthServiceImpl implements FirebaseAuthService {
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(payload, headers);
 
         try {
-            return restTemplate.postForEntity(url, requestEntity, Void.class);
+            return restTemplate.postForEntity(url, requestEntity, String.class);
         } catch (HttpClientErrorException e) {
             throw new RuntimeException("Failed to send password reset email: " + e.getResponseBodyAsString());
         }
