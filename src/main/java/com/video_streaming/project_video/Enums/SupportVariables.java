@@ -8,6 +8,7 @@ public interface SupportVariables {
         "/api/app/createUser",
         "/api/app/login",
         "/api/app/verifyToken",
+        "/api/app/reset",
         "/api/vid/view/**",
         "/api/vid/all"
     );
@@ -22,6 +23,8 @@ public interface SupportVariables {
     String refreshTokenURLSuffix = "https://securetoken.googleapis.com/v1/token?key=";
     
     String signInTokenURLSuffix = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=";
+
+    String resetUserURLSuffix = "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=";
 
     String thumbnailURLDefault = "https://github.com/shadcn.png";
 

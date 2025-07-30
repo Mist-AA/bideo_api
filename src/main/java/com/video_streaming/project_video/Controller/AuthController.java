@@ -75,4 +75,9 @@ public class AuthController {
         FirebaseRefreshTokenResponse response = firebaseAuthService.refreshIdToken(refreshToken);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/reset")
+    public ResponseEntity<String> resetUser(@RequestParam("email") String email){
+        return firebaseAuthService.sendPasswordResetEmail(email);
+    }
 }

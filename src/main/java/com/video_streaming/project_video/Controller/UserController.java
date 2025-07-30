@@ -18,7 +18,7 @@ public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
 
-    @RequestMapping(value = "/update" , method = RequestMethod.POST, consumes = { "multipart/form-data" })
+    @RequestMapping(value = "/update", method = RequestMethod.POST, consumes = { "multipart/form-data" })
     public ResponseEntity<String> updateUser(@ModelAttribute UserDTO userDTO) {
         try {
             String response = userService.updateUserProfile(userDTO);
@@ -35,5 +35,4 @@ public class UserController {
         UserDTO response = userService.getUserById(userId);
         return ResponseEntity.ok(response);
     }
-
 }
