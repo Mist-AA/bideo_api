@@ -15,6 +15,8 @@ public interface SupportVariables {
    List<String> ALLOWED_ORIGINS = List.of(
         "https://bideo.tech", 
         "https://www.bideo.tech"
+        // Uncomment the line below for development mode
+        // ,"http://localhost:3000"
     );
 
     String refreshTokenURLSuffix = "https://securetoken.googleapis.com/v1/token?key=";
@@ -23,7 +25,11 @@ public interface SupportVariables {
 
     String thumbnailURLDefault = "https://github.com/shadcn.png";
 
+    // Uncomment the line below for production mode
     String serviceAccountJson = "/app/secrets/service-account.json";
+
+    // Uncomment the line below for development mode
+    // String serviceAccountJson = "src/main/resources/service-account.json";
 
     String processedVideosFolderPath = "processed_videos";
     
