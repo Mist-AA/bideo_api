@@ -5,6 +5,8 @@ import com.google.firebase.auth.FirebaseToken;
 
 import com.video_streaming.project_video.Entity.FirebaseRefreshTokenResponse;
 import com.video_streaming.project_video.Entity.FirebaseSignInResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -65,9 +67,22 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<FirebaseSignInResponse> login(@RequestParam String email,@RequestParam String password) {
-        FirebaseSignInResponse response = firebaseAuthService.signInWithEmailAndPassword(email, password);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<FirebaseSignInResponse> login(
+            @RequestParam String email,
+            @RequestParam String password,
+            HttpServletResponse response
+    ) {
+        FirebaseSignInResponse firebaseResponse = firebaseAuthService.signInWithEmailAndPassword(email, password);
+
+        Cookie cookie = new Cookie("token", firebaseResponse.getIdToken());
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(60 * 60 * 24); // 1 day
+
+         cookie.setSecure(true);
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok(firebaseResponse);
     }
 
     @PostMapping("/refresh-token")
