@@ -18,8 +18,6 @@ import java.io.*;
 @Configuration
 public class FirebaseConfig {
 
-    public static Object firebaseAuth;
-
     @Value("${service.account.json}")
     private String serviceAccountJson;
 
@@ -34,8 +32,6 @@ public class FirebaseConfig {
             this.serviceAccount = new ClassPathResource(serviceAccountJson).getInputStream();
         }
     }
-
-    public FirebaseConfig() throws FileNotFoundException {}
 
     @Bean
     public FirebaseApp firebaseApp() {

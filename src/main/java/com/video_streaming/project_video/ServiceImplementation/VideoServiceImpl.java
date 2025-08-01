@@ -41,6 +41,7 @@ public class VideoServiceImpl implements VideoService {
     private final UserService userService;
     private final VideoRepository videoRepository;
     private final RedisTemplate<String, VideoDTO> videoRedisTemplate;
+    private final RedisTemplate<String, Long> viewsRedisTemplate;
 
     private static final Duration VIDEO_CACHE_TTL = Duration.ofMinutes(cacheTTLMinutes);
 
@@ -140,17 +141,26 @@ public class VideoServiceImpl implements VideoService {
 
     @Override
     public VideoDTO viewVideo(Long videoID) {
-        String redisKey = "video:" + videoID;
+        String videoKey = "video:" + videoID;
+        String pendingViewsKey = videoKey + ":pendingViews";
 
-        VideoDTO cached = videoRedisTemplate.opsForValue().get(redisKey);
+        VideoDTO cached = videoRedisTemplate.opsForValue().get(videoKey);
         if (cached != null) {
+            viewsRedisTemplate.opsForValue().increment(pendingViewsKey);
             return cached;
         }
         VideoDTOMapper videoDTOMapper = new VideoDTOMapper();
         Video video = videoRepository.getReferenceById(videoID);
 
+        Long pendingViews = viewsRedisTemplate.opsForValue().get(pendingViewsKey);
+        if (pendingViews != null && pendingViews > 0) {
+            video.setVideo_views(video.getVideo_views() + pendingViews);
+            videoRepository.save(video);
+            viewsRedisTemplate.delete(pendingViewsKey);
+        }
         VideoDTO videoDTO = videoDTOMapper.convertEntityToDTO(video);
-        videoRedisTemplate.opsForValue().set(redisKey, videoDTO, VIDEO_CACHE_TTL);
+
+        videoRedisTemplate.opsForValue().set(videoKey, videoDTO, VIDEO_CACHE_TTL);
         return videoDTO;
     }
 
