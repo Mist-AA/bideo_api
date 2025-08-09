@@ -84,4 +84,15 @@ public class VideoController {
         return ResponseEntity.ok(videoList);
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Page<VideoDTO>> getUserUploadedVideos(
+            @PathVariable String userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("videoId").descending());
+        Page<VideoDTO> videos = videoService.getVideosByUserId(userId, pageable);
+        return ResponseEntity.ok(videos);
+    }
+
 }

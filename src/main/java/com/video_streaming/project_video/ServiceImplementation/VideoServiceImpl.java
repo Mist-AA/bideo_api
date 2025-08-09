@@ -191,4 +191,10 @@ public class VideoServiceImpl implements VideoService {
         int secs = (int) seconds % 60;
         return String.format("%02d:%02d:%02d", hours, minutes, secs);
     }
+
+    public Page<VideoDTO> getVideosByUserId(String userId, Pageable pageable) {
+        VideoDTOMapper videoDTOMapper = new VideoDTOMapper();
+        return videoRepository.findByUploaderId(userId, pageable)
+                .map(videoDTOMapper::convertEntityToDTO);
+    }
 }
