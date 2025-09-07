@@ -164,6 +164,39 @@ public class VideoServiceImpl implements VideoService {
         return videoDTO;
     }
 
+    public Page<VideoDTO> getVideosByUserId(String userId, Pageable pageable) {
+        VideoDTOMapper videoDTOMapper = new VideoDTOMapper();
+        return videoRepository.findByUploaderId(userId, pageable)
+                .map(videoDTOMapper::convertEntityToDTO);
+    }
+
+    @Transactional
+    public boolean deleteVideo(String userId, Long videoID) {
+        return videoRepository.findById(videoID)
+                .map(video -> {
+                    if (!video.getVideo_uploader().getUserId().equals(userId)) {
+                        return false;
+                    }
+                    if (!deleteVideoFromS3(videoID)) {
+                        throw new RuntimeException("Failed to delete video from S3");
+                    }
+                    videoRepository.delete(video);
+                    logger.info("Video deleted successfully");
+                    return true;
+                })
+                .orElse(false);
+    }
+
+    private boolean deleteVideoFromS3(Long videoID) {
+        try {
+            //TO DO: Delete from S3
+            return true;
+        } catch (Exception e) {
+            logger.error("Failed to delete video from S3");
+            return false;
+        }
+    }
+
     private String getVideoDuration(String inputPath) throws IOException {
         ProcessBuilder pb = new ProcessBuilder(
                 "ffprobe",
@@ -190,11 +223,5 @@ public class VideoServiceImpl implements VideoService {
         int minutes = ((int) seconds % 3600) / 60;
         int secs = (int) seconds % 60;
         return String.format("%02d:%02d:%02d", hours, minutes, secs);
-    }
-
-    public Page<VideoDTO> getVideosByUserId(String userId, Pageable pageable) {
-        VideoDTOMapper videoDTOMapper = new VideoDTOMapper();
-        return videoRepository.findByUploaderId(userId, pageable)
-                .map(videoDTOMapper::convertEntityToDTO);
     }
 }

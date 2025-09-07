@@ -97,4 +97,15 @@ public class VideoController {
         return ResponseEntity.ok(videos);
     }
 
+    @PostMapping("/user/{userId}/{videoId}")
+    public ResponseEntity<String> deleteVideoByUser(@PathVariable String userId, @PathVariable Long videoId) {
+        boolean response = videoService.deleteVideo(userId, videoId);
+        if (response) {
+            return  ResponseEntity.ok("Successfully deleted video");
+        }
+        else {
+            return ResponseEntity.badRequest().body("Failed to delete video");
+        }
+    }
+
 }

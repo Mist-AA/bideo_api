@@ -53,17 +53,24 @@ public interface VideoService {
     /**
      * Retrieves the video information from video ID.
      *
-     * @param videoID The video ID.
+     * @param videoID The ID of the video.
      * @return VideoDTO object for specific video ID.
      */
     VideoDTO viewVideo(Long videoID);
 
     /**
-     * Retrieves videos uploaded by current user
+     * Retrieves videos uploaded by current user.
      *
-     * @param userID The user ID
-     * @param pageable The parameters of pagination
+     * @param userId The ID of the uploader.
+     * @param pageable The parameters of pagination.
      * @return VideoDTO for all user uploaded videos.
      */
     Page<VideoDTO> getVideosByUserId(String userId, Pageable pageable);
+
+    /**
+     * Deletes the video relevant for specific video ID.
+     * @param userId The ID of the uploader.
+     * @param videoID The ID of the video.
+     */
+    boolean deleteVideo(String userId, Long videoID);
 }
