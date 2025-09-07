@@ -82,7 +82,7 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
         ProcessBuilder thumbnailBuilder = new ProcessBuilder(
             "ffmpeg",
             "-i", inputVideoPath,
-            "-vf", "thumbnail,scale=320:180",
+            "-vf", "thumbnail,scale=320:-1",
             "-frames:v", "1",
             outputImagePath.getAbsolutePath()
         );
@@ -94,7 +94,10 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
     private boolean encodeTo720p(String inputPath, File encodedMp4) throws IOException, InterruptedException {
         ProcessBuilder encodeBuilder = new ProcessBuilder(
                 "ffmpeg", "-i", inputPath,
-                "-vf", "scale=720:480",
+                "-vf", "scale=-2:720",
+                "-c:v", "libx264",
+                "-preset", "fast",
+                "-crf", "23",
                 "-y",
                 encodedMp4.getAbsolutePath()
         );
@@ -107,12 +110,12 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
         ProcessBuilder hlsBuilder = new ProcessBuilder(
                 "ffmpeg", "-y",
                 "-i", encodedMp4.getAbsolutePath(),
-                "-force_key_frames", "expr:gte(t,n_forced*2)",
+                "-force_key_frames", "expr:gte(t,n_forced*5)",
                 "-c:v", "libx264",
-                "-preset", "veryfast",
+                "-preset", "fast",
                 "-crf", "23",
                 "-start_number", "0",
-                "-hls_time", "2",
+                "-hls_time", "5",
                 "-hls_list_size", "0",
                 "-f", "hls",
                 playlistFile.getAbsolutePath()

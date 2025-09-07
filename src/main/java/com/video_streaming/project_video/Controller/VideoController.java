@@ -21,6 +21,7 @@ import org.apache.tika.Tika;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -47,7 +48,8 @@ public class VideoController {
             }
             
             // Create a temp file in the system's temp directory
-            tempFile = File.createTempFile("upload-", "-" + videoFile.getOriginalFilename());
+            tempFile = File.createTempFile("upload-", "-" + Objects.requireNonNull(videoFile.getOriginalFilename()).
+                    substring(0, Math.min(videoFile.getOriginalFilename().length(), 10)));
             videoFile.transferTo(tempFile);
 
             String result = videoService.uploadFile(tempFile);
