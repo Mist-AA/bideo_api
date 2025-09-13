@@ -21,19 +21,26 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int redisPort;
 
+    @Value("${spring.data.redis.password}")
+    private String redisPassword;
+
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory(redisHost, redisPort);
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
+        config.setHostName(redisHost);
+        config.setPort(redisPort);
+        config.setPassword(redisPassword);
+        return new LettuceConnectionFactory(config);
     }
 
     @Bean
-    public RedisTemplate<String, VideoDTO> videoRedisTemplate() {
+    public RedisTemplate<String, VideoDTO> videoRedisTemplate(RedisConnectionFactory connectionFactory) {
         ObjectMapper objectMapper = new ObjectMapper(new MessagePackFactory());
         Jackson2JsonRedisSerializer<VideoDTO> messagePackSerializer =
                 new Jackson2JsonRedisSerializer<>(objectMapper, VideoDTO.class);
 
         RedisTemplate<String, VideoDTO> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactory());
+        template.setConnectionFactory(connectionFactory);
 
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(messagePackSerializer);

@@ -24,5 +24,4 @@ jobs:
           port: 22
           script: |
             cd ~/Bideo_proj
-            ls
             sh script.sh
