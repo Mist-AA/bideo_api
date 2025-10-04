@@ -36,6 +36,8 @@ public interface VideoService {
     /**
      * Uploads metadata for a video, including the result of the upload.
      *
+     * @param result Resulting string of metadata
+     * @param videoTitle The title of the video being uploaded.
      * @param userId The ID of the uploader.
      * @return Video id of the uploaded video.
      */
@@ -47,8 +49,9 @@ public interface VideoService {
      * @param videoID The ID of the video.
      * @param encodedVideoPath The new encoded video path to be set.
      * @param s3ThumbnailURL The path for thumbnail of video to be set.
+     * @param flag The flag to check if video upload successful or failed.
      */
-    void updateVideoEncodedPath(Long videoID, String encodedVideoPath, String s3ThumbnailURL);
+    void updateVideoEncodedPath(Long videoID, String encodedVideoPath, String s3ThumbnailURL, boolean flag);
 
     /**
      * Retrieves the video information from video ID.

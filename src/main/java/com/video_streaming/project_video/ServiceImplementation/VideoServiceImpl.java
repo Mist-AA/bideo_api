@@ -30,7 +30,8 @@ import java.io.InputStreamReader;
 import java.time.Duration;
 import java.util.Date;
 
-import static com.video_streaming.project_video.Enums.SupportVariables.cacheTTLMinutes;
+import static com.video_streaming.project_video.Enums.SupportVariables.cacheTTLMinutesVideo;
+import static com.video_streaming.project_video.Enums.SupportVariables.cacheTTLMinutesViews;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +44,8 @@ public class VideoServiceImpl implements VideoService {
     private final RedisTemplate<String, VideoDTO> videoRedisTemplate;
     private final RedisTemplate<String, Long> viewsRedisTemplate;
 
-    private static final Duration VIDEO_CACHE_TTL = Duration.ofMinutes(cacheTTLMinutes);
+    private static final Duration VIDEO_CACHE_TTL = Duration.ofMinutes(cacheTTLMinutesVideo);
+    private static final Duration VIEWS_CACHE_TTL = Duration.ofMinutes(cacheTTLMinutesViews);
 
     @Value("${aws.s3.bucket}")
     private String bucketName;
@@ -131,11 +133,16 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Transactional
-    public void updateVideoEncodedPath(Long videoID, String encodedVideoPath, String s3ThumbnailURL) {
+    public void updateVideoEncodedPath(Long videoID, String encodedVideoPath, String s3ThumbnailURL, boolean flag) {
         Video video = videoRepository.getReferenceById(videoID);
-        video.setM3u8Url(encodedVideoPath);
-        video.setThumbnail_url(s3ThumbnailURL);
-        video.setVideoStatus(VideoStatus.COMPLETED);
+        if (flag) {
+            video.setM3u8Url(encodedVideoPath);
+            video.setThumbnail_url(s3ThumbnailURL);
+            video.setVideoStatus(VideoStatus.COMPLETED);
+        }
+        else {
+            video.setVideoStatus(VideoStatus.FAILED);
+        }
         videoRepository.save(video);
     }
 
@@ -149,18 +156,14 @@ public class VideoServiceImpl implements VideoService {
             viewsRedisTemplate.opsForValue().increment(pendingViewsKey);
             return cached;
         }
-        VideoDTOMapper videoDTOMapper = new VideoDTOMapper();
         Video video = videoRepository.getReferenceById(videoID);
-
-        Long pendingViews = viewsRedisTemplate.opsForValue().get(pendingViewsKey);
-        if (pendingViews != null && pendingViews > 0) {
-            video.setVideo_views(video.getVideo_views() + pendingViews);
-            videoRepository.save(video);
-            viewsRedisTemplate.delete(pendingViewsKey);
-        }
+        VideoDTOMapper videoDTOMapper = new VideoDTOMapper();
         VideoDTO videoDTO = videoDTOMapper.convertEntityToDTO(video);
 
         videoRedisTemplate.opsForValue().set(videoKey, videoDTO, VIDEO_CACHE_TTL);
+
+        viewsRedisTemplate.opsForValue().increment(pendingViewsKey);
+        viewsRedisTemplate.expire(pendingViewsKey, VIEWS_CACHE_TTL);
         return videoDTO;
     }
 

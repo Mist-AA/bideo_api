@@ -26,5 +26,7 @@ public interface SupportVariables {
 
     String processedVideosFolderPath = "processed_videos";
 
-    int cacheTTLMinutes = 3;
+    int cacheTTLMinutesVideo = 3;
+
+    int cacheTTLMinutesViews = 130;
 }

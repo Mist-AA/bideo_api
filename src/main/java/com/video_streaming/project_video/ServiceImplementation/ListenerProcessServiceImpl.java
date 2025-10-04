@@ -63,9 +63,10 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
             String s3URL = s3Info[0];
             String s3ThumbnailURL = s3Info[1];
             logger.info("Video uploaded to S3 at: {}", s3URL);
-            videoService.updateVideoEncodedPath(videoID, s3URL, s3ThumbnailURL);
+            videoService.updateVideoEncodedPath(videoID, s3URL, s3ThumbnailURL, true);
 
         } catch (Exception e) {
+            videoService.updateVideoEncodedPath(videoID, null, null, false);
             logger.error("Video processing/upload failed:", e);
         }
         finally {
