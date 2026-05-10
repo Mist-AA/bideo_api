@@ -10,8 +10,11 @@ public interface SupportVariables {
             );
 
     List<String> ALLOWED_ORIGINS = List.of(
-            "https://bideo.tech",
-            "https://www.bideo.tech"
+            "https://bideo.rajit.cc",
+            "http://bideo.rajit.cc"
+            // Discarded domains
+            //"https://bideo.tech",
+            //"https://www.bideo.tech"
             // Uncomment the line below for development mode
             // ,"http://localhost:3000"
             );
