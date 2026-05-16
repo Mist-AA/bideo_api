@@ -3,13 +3,13 @@
   <img src="banner.gif" alt="bideo.tech Banner" width="100%">
 </p>
 
-<h1 align="center">🎥 bideo.tech — Scalable Video Streaming Platform</h1>
+<h1 align="center">🎥 bideo — Scalable Video Streaming Platform</h1>
 <p align="center">
   <i>A high-performance video streaming platform built for the modern web</i>
 </p>
 
 <p align="center">
-  <a href="https://bideo.tech"><img src="https://img.shields.io/badge/Live%20Demo-bideo.tech-blue?style=flat&logo=google-chrome" alt="Live Demo"></a>
+  <a href="https://bideo.rajit.cc"><img src="https://img.shields.io/badge/Live%20Demo-bideo.tech-blue?style=flat&logo=google-chrome" alt="Live Demo"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=flat&logo=open-source-initiative" alt="License"></a>
   <img src="https://img.shields.io/badge/Backend-Spring%20Boot-6DB33F?logo=springboot&logoColor=white" alt="Backend">
   <img src="https://img.shields.io/badge/Frontend-React-61DAFB?logo=react&logoColor=black" alt="Frontend">
@@ -19,7 +19,7 @@
 
 ## 📖 About the Project
 
-**bideo.tech** is a **YouTube-like** video streaming platform that combines **Spring Boot, AWS S3, RabbitMQ, Redis, PostgreSQL, and Firebase** to deliver a seamless streaming experience.
+**bideo** is a **YouTube-like** video streaming platform that combines **Spring Boot, AWS S3, RabbitMQ, Redis, PostgreSQL, and Firebase** to deliver a seamless streaming experience.
 
 It supports:
 - Video upload and processing (**HLS format**)
