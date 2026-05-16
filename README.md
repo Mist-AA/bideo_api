@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://bideo.rajit.cc"><img src="https://img.shields.io/badge/Live%20Demo-bideo.tech-blue?style=flat&logo=google-chrome" alt="Live Demo"></a>
+  <a href="https://bideo.rajit.cc"><img src="https://img.shields.io/badge/Live%20Demo-bideo-blue?style=flat&logo=google-chrome" alt="Live Demo"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=flat&logo=open-source-initiative" alt="License"></a>
   <img src="https://img.shields.io/badge/Backend-Spring%20Boot-6DB33F?logo=springboot&logoColor=white" alt="Backend">
   <img src="https://img.shields.io/badge/Frontend-React-61DAFB?logo=react&logoColor=black" alt="Frontend">
