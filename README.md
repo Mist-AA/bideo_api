@@ -114,7 +114,7 @@ git clone https://github.com/Mist-AA/bideo_api
 
 # Clone Frontend Rerpository
 https://github.com/rajitk13/bideo_ui
-In global.ts change https://bideo.tech path to http://localhost:8080
+In global.ts change https://bideo.rajit.cc path to http://localhost:8080
 ```
 
 ---
