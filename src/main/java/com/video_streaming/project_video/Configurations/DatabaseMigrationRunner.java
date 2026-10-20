@@ -19,6 +19,13 @@ public class DatabaseMigrationRunner implements CommandLineRunner {
         try {
             logger.info("Checking and applying database schema migrations for video SEO and metadata...");
 
+            // 0. Enable pg_trgm extension for fuzzy trigram search
+            try {
+                jdbcTemplate.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm;");
+            } catch (Exception e) {
+                logger.warn("Could not create pg_trgm extension: {}", e.getMessage());
+            }
+
             // 1. Add new columns if missing
             jdbcTemplate.execute("ALTER TABLE vid_metadata ADD COLUMN IF NOT EXISTS slug VARCHAR(255);");
             jdbcTemplate.execute("ALTER TABLE vid_metadata ADD COLUMN IF NOT EXISTS description TEXT;");

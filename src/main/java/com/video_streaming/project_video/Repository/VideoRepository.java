@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,7 +15,7 @@ import com.video_streaming.project_video.Enums.VideoCategory;
 import com.video_streaming.project_video.Enums.VideoStatus;
 import com.video_streaming.project_video.Enums.VideoVisibility;
 
-public interface VideoRepository extends JpaRepository<Video, Long> {
+public interface VideoRepository extends JpaRepository<Video, Long>, JpaSpecificationExecutor<Video> {
 
     @Query("SELECT v FROM Video v WHERE v.video_uploader.userId = :userId")
     Page<Video> findByUploaderId(@Param("userId") String userId, Pageable pageable);
@@ -37,21 +38,40 @@ public interface VideoRepository extends JpaRepository<Video, Long> {
             Pageable pageable
     );
 
-    @Query("SELECT DISTINCT v FROM Video v " +
-           "LEFT JOIN v.tags t " +
-           "WHERE v.visibility = :visibility " +
-           "AND v.videoStatus = :videoStatus " +
-           "AND (:category IS NULL OR v.category = :category) " +
-           "AND (:tag IS NULL OR LOWER(t) = LOWER(:tag)) " +
-           "AND (:query IS NULL OR :query = '' OR " +
-           "     LOWER(v.video_title) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-           "     LOWER(v.description) LIKE LOWER(CONCAT('%', :query, '%')))")
-    Page<Video> searchVideos(
+    @Query(value = "SELECT DISTINCT v.* FROM vid_metadata v " +
+                   "LEFT JOIN video_tags t ON v.video_id = t.video_id " +
+                   "WHERE (v.visibility = 'PUBLIC' OR v.visibility IS NULL) " +
+                   "AND (v.video_status = 'COMPLETED' OR v.video_status IS NULL) " +
+                   "AND (:category IS NULL OR v.category = :category) " +
+                   "AND (:tag IS NULL OR LOWER(t.tag) = LOWER(:tag)) " +
+                   "AND ( " +
+                   "     v.video_title ILIKE CONCAT('%', :query, '%') " +
+                   "  OR v.description ILIKE CONCAT('%', :query, '%') " +
+                   "  OR v.slug ILIKE CONCAT('%', :query, '%') " +
+                   "  OR t.tag ILIKE CONCAT('%', :query, '%') " +
+                   "  OR similarity(v.video_title, :query) > 0.2 " +
+                   "  OR similarity(v.description, :query) > 0.15 " +
+                   ") " +
+                   "ORDER BY similarity(v.video_title, :query) DESC, v.video_id DESC",
+           countQuery = "SELECT COUNT(DISTINCT v.video_id) FROM vid_metadata v " +
+                        "LEFT JOIN video_tags t ON v.video_id = t.video_id " +
+                        "WHERE (v.visibility = 'PUBLIC' OR v.visibility IS NULL) " +
+                        "AND (v.video_status = 'COMPLETED' OR v.video_status IS NULL) " +
+                        "AND (:category IS NULL OR v.category = :category) " +
+                        "AND (:tag IS NULL OR LOWER(t.tag) = LOWER(:tag)) " +
+                        "AND ( " +
+                        "     v.video_title ILIKE CONCAT('%', :query, '%') " +
+                        "  OR v.description ILIKE CONCAT('%', :query, '%') " +
+                        "  OR v.slug ILIKE CONCAT('%', :query, '%') " +
+                        "  OR t.tag ILIKE CONCAT('%', :query, '%') " +
+                        "  OR similarity(v.video_title, :query) > 0.2 " +
+                        "  OR similarity(v.description, :query) > 0.15 " +
+                        ")",
+           nativeQuery = true)
+    Page<Video> searchVideosFuzzy(
             @Param("query") String query,
-            @Param("category") VideoCategory category,
+            @Param("category") String category,
             @Param("tag") String tag,
-            @Param("visibility") VideoVisibility visibility,
-            @Param("videoStatus") VideoStatus videoStatus,
             Pageable pageable
     );
 
