@@ -1,11 +1,15 @@
 package com.video_streaming.project_video.Service;
 
 import com.video_streaming.project_video.DTOs.VideoDTO;
+import com.video_streaming.project_video.DTOs.VideoMetadataUpdateRequest;
+import com.video_streaming.project_video.Enums.VideoCategory;
+import com.video_streaming.project_video.Enums.VideoVisibility;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public interface VideoService {
 
@@ -27,24 +31,37 @@ public interface VideoService {
     String[] uploadDirectory(File directory, String fileNamePrefix);
 
     /**
-     * Retrieves a list of all videos available on the server.
+     * Retrieves a list of all public completed videos available on the server.
      * @param pageable Information required for pagination.
-     * @return A list of VideoDTO objects representing the videos.
+     * @return A page of VideoDTO objects representing the videos.
      */
     Page<VideoDTO> getAllVideos(Pageable pageable);
 
     /**
-     * Uploads metadata for a video, including the result of the upload.
+     * Uploads metadata for a video with title and user ID.
      *
-     * @param result Resulting string of metadata
-     * @param videoTitle The title of the video being uploaded.
+     * @param result S3 URL of the original video.
+     * @param videoTitle The title of the video.
      * @param userId The ID of the uploader.
      * @return Video id of the uploaded video.
      */
     Long uploadVideoMetadata(String result, String videoTitle, String userId) throws IOException;
 
     /**
-     * Updates the encoded video path for a specific video.
+     * Uploads metadata for a video with full SEO fields.
+     */
+    Long uploadVideoMetadata(
+            String result,
+            String videoTitle,
+            String description,
+            List<String> tags,
+            VideoCategory category,
+            VideoVisibility visibility,
+            String userId
+    ) throws IOException;
+
+    /**
+     * Updates the encoded video path for a specific video with success flag.
      *
      * @param videoID The ID of the video.
      * @param encodedVideoPath The new encoded video path to be set.
@@ -54,12 +71,35 @@ public interface VideoService {
     void updateVideoEncodedPath(Long videoID, String encodedVideoPath, String s3ThumbnailURL, boolean flag);
 
     /**
+     * Updates the encoded video path for a specific video (default flag true).
+     */
+    void updateVideoEncodedPath(Long videoID, String encodedVideoPath, String s3ThumbnailURL);
+
+    /**
      * Retrieves the video information from video ID.
      *
      * @param videoID The ID of the video.
      * @return VideoDTO object for specific video ID.
      */
     VideoDTO viewVideo(Long videoID);
+
+    /**
+     * Retrieves the video information from SEO slug.
+     *
+     * @param slug The SEO slug of the video.
+     * @return VideoDTO object.
+     */
+    VideoDTO viewVideoBySlug(String slug);
+
+    /**
+     * Updates video metadata (title, description, tags, category, visibility).
+     */
+    VideoDTO updateVideoMetadata(Long videoId, String userId, VideoMetadataUpdateRequest updateRequest);
+
+    /**
+     * Searches videos by keyword, category, and tag with pagination.
+     */
+    Page<VideoDTO> searchVideos(String query, VideoCategory category, String tag, Pageable pageable);
 
     /**
      * Retrieves videos uploaded by current user.
@@ -71,9 +111,14 @@ public interface VideoService {
     Page<VideoDTO> getVideosByUserId(String userId, Pageable pageable);
 
     /**
-     * Deletes the video relevant for specific video ID.
+     * Deletes the video relevant for specific video ID, including S3 cleanup.
      * @param userId The ID of the uploader.
      * @param videoID The ID of the video.
      */
     boolean deleteVideo(String userId, Long videoID);
+
+    /**
+     * Flushes accumulated pending views from Redis to PostgreSQL.
+     */
+    void syncPendingViewsToDatabase();
 }

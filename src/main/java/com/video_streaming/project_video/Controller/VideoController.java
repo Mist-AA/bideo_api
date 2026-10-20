@@ -1,6 +1,9 @@
 package com.video_streaming.project_video.Controller;
 
 import com.video_streaming.project_video.DTOs.VideoDTO;
+import com.video_streaming.project_video.DTOs.VideoMetadataUpdateRequest;
+import com.video_streaming.project_video.Enums.VideoCategory;
+import com.video_streaming.project_video.Enums.VideoVisibility;
 import com.video_streaming.project_video.Service.VideoService;
 
 import lombok.RequiredArgsConstructor;
@@ -21,6 +24,7 @@ import org.apache.tika.Tika;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -33,8 +37,15 @@ public class VideoController {
     private final SenderProcessService messageSender;
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadVidResponseEntity(@RequestParam("file") MultipartFile videoFile, 
-                                                                                @RequestParam String videoTitle, @RequestParam String userId) {
+    public ResponseEntity<String> uploadVidResponseEntity(
+            @RequestParam("file") MultipartFile videoFile, 
+            @RequestParam String videoTitle, 
+            @RequestParam String userId,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) List<String> tags,
+            @RequestParam(required = false, defaultValue = "OTHER") VideoCategory category,
+            @RequestParam(required = false, defaultValue = "PUBLIC") VideoVisibility visibility) {
+
         if (videoFile.isEmpty()) {
             return ResponseEntity.badRequest().body("File is empty");
         }
@@ -53,7 +64,15 @@ public class VideoController {
             videoFile.transferTo(tempFile);
 
             String result = videoService.uploadFile(tempFile);
-            Long videoID = videoService.uploadVideoMetadata(result, videoTitle, userId);
+            Long videoID = videoService.uploadVideoMetadata(
+                    result,
+                    videoTitle,
+                    description,
+                    tags,
+                    category,
+                    visibility,
+                    userId
+            );
 
             messageSender.sendVideoPath(result, videoID);
             return ResponseEntity.ok(result);
@@ -78,6 +97,33 @@ public class VideoController {
         return ResponseEntity.ok(videoDTO);
     }
 
+    @GetMapping("/slug/{slug}")
+    public ResponseEntity<VideoDTO> getVideoBySlug(@PathVariable String slug) {
+        VideoDTO videoDTO = videoService.viewVideoBySlug(slug);
+        return ResponseEntity.ok(videoDTO);
+    }
+
+    @PutMapping("/{videoId}")
+    public ResponseEntity<VideoDTO> updateVideoMetadata(
+            @PathVariable Long videoId,
+            @RequestParam String userId,
+            @RequestBody VideoMetadataUpdateRequest updateRequest) {
+        VideoDTO updatedVideo = videoService.updateVideoMetadata(videoId, userId, updateRequest);
+        return ResponseEntity.ok(updatedVideo);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<VideoDTO>> searchVideos(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) VideoCategory category,
+            @RequestParam(required = false) String tag,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("videoId").descending());
+        Page<VideoDTO> results = videoService.searchVideos(query, category, tag, pageable);
+        return ResponseEntity.ok(results);
+    }
+
     @GetMapping("/all")
     public ResponseEntity<Page<VideoDTO>> getAllVideosList(@RequestParam(defaultValue = "0") int page,
                                                            @RequestParam(defaultValue = "10") int size) {
@@ -97,13 +143,12 @@ public class VideoController {
         return ResponseEntity.ok(videos);
     }
 
-    @PostMapping("/user/{userId}/{videoId}")
+    @RequestMapping(value = "/user/{userId}/{videoId}", method = {RequestMethod.POST, RequestMethod.DELETE})
     public ResponseEntity<String> deleteVideoByUser(@PathVariable String userId, @PathVariable Long videoId) {
         boolean response = videoService.deleteVideo(userId, videoId);
         if (response) {
-            return  ResponseEntity.ok("Successfully deleted video");
-        }
-        else {
+            return ResponseEntity.ok("Successfully deleted video");
+        } else {
             return ResponseEntity.badRequest().body("Failed to delete video");
         }
     }

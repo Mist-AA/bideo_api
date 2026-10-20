@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.video_streaming.project_video.Configurations.RabbitMQConfig;
@@ -29,6 +30,9 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
 
     private static final Logger logger = LoggerFactory.getLogger(ListenerProcessServiceImpl.class);
     private final VideoService videoService;
+
+    @Value("${ffmpeg.timeout.minutes:15}")
+    private int ffmpegTimeoutMinutes = 15;
 
     @RabbitListener(queues = RabbitMQConfig.QUEUE)
     public void receiveVideo(MessageDTO message) {
@@ -66,10 +70,11 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
             videoService.updateVideoEncodedPath(videoID, s3URL, s3ThumbnailURL, true);
 
         } catch (Exception e) {
-            videoService.updateVideoEncodedPath(videoID, null, null, false);
-            logger.error("Video processing/upload failed:", e);
-        }
-        finally {
+            logger.error("Video processing/upload failed for video ID {}: {}", videoID, e.getMessage(), e);
+            if (videoID != null) {
+                videoService.updateVideoEncodedPath(videoID, null, null, false);
+            }
+        } finally {
             File outputDir = new File(processedVideosFolderPath);
             if (outputDir.exists() && outputDir.isDirectory()) {
                 for (File file : Objects.requireNonNull(outputDir.listFiles())) {
@@ -144,12 +149,16 @@ public class ListenerProcessServiceImpl implements ListenerProcessService {
             }
         }
 
-        boolean finished = hlsProcess.waitFor(10, TimeUnit.SECONDS);
+        boolean finished = hlsProcess.waitFor(ffmpegTimeoutMinutes, TimeUnit.MINUTES);
         if (!finished) {
             hlsProcess.destroyForcibly();
-            throw new RuntimeException("FFmpeg timeout");
-        } else {
-            return true;
+            throw new RuntimeException("FFmpeg timed out after " + ffmpegTimeoutMinutes + " minutes");
         }
+
+        if (hlsProcess.exitValue() != 0) {
+            throw new RuntimeException("FFmpeg exited with non-zero exit code: " + hlsProcess.exitValue());
+        }
+
+        return true;
     }
 }

@@ -6,12 +6,16 @@ public interface SupportVariables {
     List<String> WHITELISTED_PATHS = List.of(
             "/api/app/**",
             "/api/vid/view/**",
-            "/api/vid/all"
+            "/api/vid/slug/**",
+            "/api/vid/search",
+            "/api/vid/all",
+            "/api/vid/user/**"
             );
 
     List<String> ALLOWED_ORIGINS = List.of(
             "https://bideo.rajit.cc",
-            "http://bideo.rajit.cc"
+            "http://bideo.rajit.cc",
+            "https://www.bideo.rajit.cc"
             // Discarded domains
             //"https://bideo.tech",
             //"https://www.bideo.tech"
