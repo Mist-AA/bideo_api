@@ -30,9 +30,10 @@ public interface VideoRepository extends JpaRepository<Video, Long> {
 
     boolean existsBySlug(String slug);
 
+    @Query("SELECT v FROM Video v WHERE (v.visibility = :visibility OR v.visibility IS NULL) AND (v.videoStatus = :videoStatus OR v.videoStatus IS NULL)")
     Page<Video> findByVisibilityAndVideoStatus(
-            VideoVisibility visibility,
-            VideoStatus videoStatus,
+            @Param("visibility") VideoVisibility visibility,
+            @Param("videoStatus") VideoStatus videoStatus,
             Pageable pageable
     );
 
